@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Enable Bitlocker Disk Encryption Via Scheduled Task"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/enable-bitlocker-disk-encryption-via-scheduled-task.html" rel="bookmark"
+           title="Permalink to "Enable Bitlocker Disk Encryption Via Scheduled Task"">"Enable Bitlocker Disk Encryption Via Scheduled Task"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-10-07T10:26:47-04:00">
+                Published: Tue 07 October 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p>Enable Bitlocker Disk Encryption Via Scheduled Task</p>
+<p>I've been working on deploying Bitlocker across our Active Directory domain via a scheduled task. My goals here were as such:</p>
+<ul>
+<li>Enable encryption on any platform which is capable of running it.</li>
+<li>Prepare the disk for encryption (if necessary).</li>
+<li>On some of our devices (HP EliteBooks) the TPM was not enabled by default, so I needed to enable it.</li>
+</ul>
+<p>The advantage of using a scheduled task to enable Bitlocker (versus a startup or shutdown script) is that I can configure it to run when the computer is idle. I liked this solution over a startup script because my users on laptops very <em>very</em> rarely reboot their computers, and so startup scripts very <em>very</em> rarely get a chance to run.</p>
+<!-- more -->
+
+<h1>Prepare the Script</h1>
+<p>We only have two vendors worth of laptops in our environment: Lenovo and HP. Our Lenovos are all ThinkPad Yoga units, which are capable of running Bitlocker already. The HPs (EliteBook 2730p, 2740p, and 2760p units) were not configured correctly by me when imaged, and so I need to tweak them before I can enable encryption. Namely, they:</p>
+<ul>
+<li>Do not have the proper disk layout (no dedicated system partition).</li>
+<li>Do not have their TPM enabled.</li>
+</ul>
+<p>Both of these issues are relatively easy to remedy:</p>
+<ul>
+<li>To fix the disk layout, I need to run <code>bdehdcfg -target default -quiet</code> and then reboot the machine. </li>
+<li>To enable the TPM, I need to apply a BIOS change and then reboot the machine.</li>
+</ul>
+<p>These two steps can be completed at the same time. Once the machine is rebooted, we can enabled encryption. </p>
+<p>I created a PowerShell script that handles all of this for me. This script is reproduced below, but be aware that you will probably need to customize it a little for your environment. In short, it detects if the disk is encrypted via WMI, then if the vendor is HP, it applies a BIOS configuration change and corrects the disk layout if necessary. From there, if there is an encryptable C: volume, it encrypts that volume. On the HPs, there will not be an encryptable volume until the machine reboots. If the machine is a Lenovo, enable the encryption. In our environment the Lenovos are already set up properly so we just enable the encryption. </p>
+<p>Note:</p>
+<ul>
+<li>Before doing this you should have already set up your group policies so that Bitlocker keys are automatically backed up to Active Directory.</li>
+<li>This script uses the Get-TPM cmdlet, which is only available on Windows 8.1 (I believe). If you are using Windows 7 or Windows 8, you will need to use WMI. I chose to use the cmdlet because everyone here is on Windows 8.1 and I find WMI to be kind of gross.</li>
+</ul>
+<p>{% codeblock lang:ps1 Enable-Bitlocker.ps1 %}</p>
+<h1>Name: Enable-Bitlocker.ps1</h1>
+<h1>Usage: Enable-Bitlocker.ps1</h1>
+<h1>Description:</h1>
+<h1>Enables the Trusted Platform Module (TPM) on HP EliteBook machines so that</h1>
+<h1>Bitlocker encryption with TPM unlock can be used. It can also prepare the</h1>
+<h1>disk drive on HPs for encryption.</h1>
+<h1></h1>
+<h1>If conditions are correct, encrypt the drive.</h1>
+<h1>Returns the directory from which the script is running.</h1>
+<p>function Get-ScriptDirectory {
+    $Invocation = (Get-Variable MyInvocation -Scope 1).Value
+    Split-Path $Invocation.MyCommand.Path
+}</p>
+<p>pushd (get-scriptDirectory)</p>
+<h1>Get the target volume's encryption properties.</h1>
+<p>$volume = Get-WmiObject win32_EncryptableVolume <code>-Namespace root\CIMv2\Security\MicrosoftVolumeEncryption</code>
+    -Filter "DriveLetter = 'C:'"</p>
+<h1>Get the target system's manufacturer.</h1>
+<p>$manufacturer = (get-wmiobject win32_computersystem).Manufacturer</p>
+<h1>If the manufacturer is HP, and the volume is not encrypted, prepare it.</h1>
+<p>if ( $manufacturer -eq "Hewlett-Packard" -and ( $volume.encryptionmethod -eq 0 -or !$volume) ) {</p>
+<div class="highlight"><pre><span></span>$tpm = get-TPM
+
+# Is the TPM not enabled? Enable it.
+if ( $tpm.TpmReady -eq $false ) {
+    .\BiosConfigUtility64.exe /SetConfig:Enable-TPM.cfg /cspwd:biospassword /cspwd:&quot;&quot;
+}
+
+# Is there not an encryptable volume? Make C: encryptable with bdehdcfg.
+if ( -not $volume ) {
+    bdehdcfg -target default -quiet
+}
+
+# Is the TPM ready and the volume encryptable? Encrypt it.
+if ($tpm.TpmReady -eq $true -and $volume ) {
+    manage-bde -on c: -s -rp
+}
+</pre></div>
+
+
+<p>} </p>
+<h1>If this is a Lenovo machine that is not encrypted, encrypt it.</h1>
+<p _="%" endcodeblock>if ( $manufacturer -eq "LENOVO" -and $volume.encryptionmethod -eq 0 ) {
+    manage-bde -on c: -s -rp
+}</p>
+<p>The script uses the <a href="http://ftp.hp.com/pub/caps-softpaq/cmit/HP_BCU.html">HP BIOS Configuration Utility (BCU)</a> available for HP devices as part of the HP System Software Manager. The configuration file used in my script is below. This is confirmed to work on the HP EliteBook 2730p, HP EliteBook 2740p, and the HP EliteBook 2760p. In the BiosConfigUtility64 command, you will need to specify your BIOS admin password with the <code>/cspwd:</code> parameter. One handy feature is that you can supply multiple passwords with multiple <code>/cspwd</code> parameters. A (kind of) hidden setting in the HP BIOS is the <code>Embedded Security Activation Policy</code> feature. This isn't exposed in the BIOS UI, but when you use the BCU to get the BIOS's configuration it will be there. This setting determines whether or not your users will be given the chance to accept or reject activation of the TPM when the machine is rebooted. Naturally, I did not want to give my users the chance to reject enabling their TPM, so the setting is changed to <code>No prompts</code>.</p>
+<p _="%" endcodeblock>{% codeblock lang:text Enable-TPM.cfg  %}
+English
+TPM Reset to Factory Defaults
+    Yes
+    <em>No
+Reset of TPM from OS
+    </em>Disable
+    Enable
+OS Management of TPM
+    Disable
+    <em>Enable
+Activate Embedded Security On Next Boot
+    Disable
+    </em>Enable
+Embedded Security Device Availability
+    <em>Available
+    Hidden
+Embedded Security Activation Policy
+    F1 to Boot
+    Allow user to reject
+    </em>No prompts</p>
+<p>Once you have the script ready, you need to put it and the BCU (if needed) somewhere accessible via your domain computers. I chose a public install share, \example.local\Install\Bitlocker.</p>
+<h1>Schedule a Task to Enable Bitlocker via PowerShell</h1>
+<p>Once the script is ready, it is time to use Group Policy to create a Scheduled Task on our computers to run the script. </p>
+<ol>
+<li>Create a new GPO and navigate to Computer Configuration\Preferences\Control Panel Settings\Scheduled Tasks. </li>
+<li>Create a new task (Enable Bitlocker).</li>
+<li>Use Action: Update.</li>
+<li>Run as the NT Authority\System user.</li>
+<li>Check "Run with highest privileges".</li>
+<li>Configure for: "Windows 7".</li>
+<li>Trigger: On idle.</li>
+<li>Actions: Start a program.</li>
+<li>Program/script: powershell</li>
+<li>Add arguments(optional): -ExecutionPolicy Bypass -file \example.local\Install\Bitlocker\Enable-Bitlocker.ps1</li>
+<li>Start in(optional): \example.local\Install\Bitlocker\</li>
+<li>Conditions</li>
+<li>Check <em>Start the task only if the computer is idle for 1 minute.</em></li>
+<li>Wait for idle for: 2 hours</li>
+<li>Settings</li>
+<li><em>Allow task to be run on demand</em> (helps with testing).</li>
+<li>Run task as soon as possible after a scheduled start is missed</li>
+</ol>
+<p>Now you have your scheduled task created. If you want to test some computers, run <code>gpupdate /force</code> on them. View the task scheduler and in the library you should see your task to enable Bitlocker. If you run it manually, the disk should start encrypting if the script determines conditions are right. Note that in the action, we set powershell's execution policy to <em>bypass</em>. This is very important on machines which may have their execution policy set to something restrictive. Your scheduled task will run, but PowerShell will not actually run the script if you do not use the <code>-ExecutionPolicy Bypass</code> parameter to <code>powershell.exe</code>. This is the key to running <em>any</em> PowerShell script via a scheduled task. This execution policy "feature" was driving me crazy while I was in testing.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

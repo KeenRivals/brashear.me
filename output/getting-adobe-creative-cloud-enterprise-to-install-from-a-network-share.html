@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Getting Adobe Creative Cloud Enterprise to Install from a Network Share"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/getting-adobe-creative-cloud-enterprise-to-install-from-a-network-share.html" rel="bookmark"
+           title="Permalink to "Getting Adobe Creative Cloud Enterprise to Install from a Network Share"">"Getting Adobe Creative Cloud Enterprise to Install from a Network Share"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-02T13:19:04-04:00">
+                Published: Wed 02 April 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p>I've been fighting geting Adobe Creative Cloud to install properly from a LiteTouch deployment share. In my troubleshooting, I was always able to install the exceptions just fine, but the MSI package created by Adobe's Creative Cloud Packager would not run successfully from a network share. When I tried to log what was happening, I kept getting a 1603 error in the InstallFinalize step along the lines of the following:
+<!-- more -->
+{% codeblock lang:text MSI Log File %}
+Action start 13:33:43: InstallFinalize.
+CustomAction CADeploy returned actual error code 1603 (note this may not be 100% accurate if translation happened inside sandbox)
+Action ended 13:34:15: InstallFinalize. Return value 3.
+Action ended 13:34:15: INSTALL. Return value 3.</p>
+<p>-- Lines Omitted --</p>
+<p>=== Logging stopped: 4/2/2014  13:34:15 ===
+MSI (s) (B4:2C) [13:34:15:574]: Product: AdobeCreativeCloud -- Installation operation failed.</p>
+<p _="%" endcodeblock>MSI (s) (B4:2C) [13:34:15:574]: Windows Installer installed the product. Product Name: AdobeCreativeCloud. Product Version: 1.2.0000. Product Language: 1033. Manufacturer: Adobe Systems Incorporated. Installation success or error status: 1603.</p>
+<p>In my experience, error 1603 usually means some sort of file access issue (either it is missing or you don't have permissions to access it). What was confusing was that when I ran the deployment from a local drive it was always successful. After searching forums and Google for many hours I decided to come up with my own workaround. I zipped up the "Build" folder in my created package, and then wrote a batch script to extract the Build folder to a temporary directory and then install from there. This method has worked every time. The only downside is that it is a bit slower than the method that should work (and used to when I created an Adobe CC package around the same time last year).</p>
+<p>If you'd like to recreate my resolution:
+  1. Download <a href="http://7-zip.org">7-zip</a> and extract 7z.exe and 7z.dll from the installer. 
+  2. Copy these files to your Adobe CC package folder (same one that has <em>packagename</em>.ccp).
+  3. Create a ZIP file of your Build folder in your Adobe CC package folder. Mine is just Build.zip.
+  4. In your silent install script, just extract the Build.zip file to a temporary folder and install the MSI package from there.</p>
+<p>You can use my own silent installation script to see how this is all done.</p>
+<p>{% codeblock lang:bat install.bat %}
+pushd "%~dp0"</p>
+<p>REM Install Adobe applications that much be installed before the main package.
+start /wait /D "Exceptions" "ExceptionsDeployer" Exceptions\ExceptionDeployer.exe --workflow=install --mode=pre --installLangauge=en_US</p>
+<p>REM Extract the Adobe CC "Build" folder to a temporary directory and install
+start /wait "Adobe CC Extraction" 7z.exe x -o%temp%\AdobeCCBuild Build.zip
+start /wait "Adobe CC Install" msiexec /i %temp%\AdobeCCBuild\Build\AdobeCreativeCloud.msi /qb</p>
+<p>REM Install Adobe applications that must be installed after the main package
+start /wait /D "Exceptions" "ExceptionsDeployer" Exceptions\ExceptionDeployer.exe --workflow=install --mode=post</p>
+<p>REM Update Adobe Acrobat XI to 11.0.06
+start /wait "Acrobat Update" msiexec /p AcrobatUpd11006.msp /qb</p>
+<p _="%" endcodeblock>REM Remove the temporary directory we created. 
+rmdir /s /q %temp%\AdobeCCBuild</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

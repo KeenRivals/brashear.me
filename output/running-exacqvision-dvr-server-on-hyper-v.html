@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Running ExacqVision DVR Server on Hyper-V"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/running-exacqvision-dvr-server-on-hyper-v.html" rel="bookmark"
+           title="Permalink to "Running ExacqVision DVR Server on Hyper-V"">"Running ExacqVision DVR Server on Hyper-V"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-07T10:16:23-04:00">
+                Published: Thu 07 April 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p><a href="https://exacq.com/">ExacqVision</a> is a DVR suite for security cameras. It works all right, I can't really complain on that front. However, they license their software based on the MAC address of the server. This is pretty stupid on its face because it means a failure of the NIC means you need to relicense your server (which costs $$$ for a transfer) and in virtual environments, MAC addresses change easily. It gets really stupid when the software is incapable of reading the NIC's MAC just because it is a Hyper-V NIC and I can't license my server because of it. Thankfully, it's possible to work around the issue.</p>
+<!-- more -->
+
+<p>In my setup, I have Server 2012 R2 running Hyper-V in a cluster with two nodes. ExacqVision supports virtual servers via an ESXi virtual appliance, and they want you <a href="https://exacq.com/kb/#loadAnswer~872dd883-65ad-6832-84e8-56040ecf6bdc~2390b846-d254-0d15-3020-49b7deab2088">to use a specific NIC in ESXi</a> in order for their software to work. In my setup, I can't use that NIC because it isn't in Hyper-V! I set up the original server as a Generation 2 (UEFI) VM, and there was no way for Exacq to pick up the NIC's MAC. Exacq support was supremely unhelpful, insisting that there was no way it would work and Hyper-V was unsupported.</p>
+<p>For me, the solution was to create a new Generation 1 (BIOS) VM. I used a legacy network adapter and set the MAC address to match my licensed MAC. Since legacy adapter performance is not great, I also added a regular adapter and left the legacy adapter disconnected. I set the MAC to be the same on both adapters just in case. Note that it seems like if you change the MAC <em>after</em> installing ExacqVision, it will not read it correctly. I'm guessing the software does some checking for NIC shenanigans but I did not thoroughly test this hypothesis.</p>
+<p>After installing ExacqVision, the server software was able to be licensed properly. The funny thing is the server software sees the legacy adapter (eth0) but has no idea about the network adapter the server is actually using! Exacq, your license model is broken!</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

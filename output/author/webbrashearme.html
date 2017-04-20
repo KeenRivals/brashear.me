@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Fighting the System - web@brashear.me</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/the-complete-reddit-place-data-and-timelapse.html">"The Complete Reddit Place Data and Timelapse"</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-04-17T15:45:27-05:00">
+                Published: Mon 17 April 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info --><p>After place ended I became fascinated with the time lapses. Unfortunately, every one I saw was incomplete. Most began some time after the start of /r/place, and had a resolution of several minutes or worse. Thanks to a lucky break I was able to construct a complete time lapse of /r/place with 1-second resolution.</p>
+<p>I was browsing the <a href="https://news.ycombinator.com/item?id=14109158">Hacker News thread</a> on /r/place and found <a href="https://news.ycombinator.com/item?id=14110015">a comment which linked to the raw place data</a> which has since been removed. Nevertheless, I had a copy to work with, so I got started. The result is a glorious 60fps timelapse with 1-second resolution that's nearly 1.5 hours long. Be warned that it starts out VERY slowly. My guess is it's the admins testing stuff.</p>
+<p>Here's the <a href="https://youtu.be/BfF7gtPA5HY">9-minute time lapse on YouTube</a>. The real action starts about <a href="https://youtu.be/BfF7gtPA5HY?t=98">1:38</a> in.</p>
+<!-- more -->
+
+<h1>The Data</h1>
+<p>The data was in timestamp,username,x_coordinate,y_coordinate,color tuples. If I started from the earliest timestamp I could reconstruct /r/place one second at a time! Here is a <a href="https://mega.nz/#!E0gQ2KiY!n6HnDfR8bpQz79fKv4GtTt06S4iLSBq7bDfeo-rxuUU">copy of the CSV file I used</a>. I have scrubbed the usernames. Given that the original source data was deleted, I don't want to be the guy to release usernames if releasing them was unintentional in the first place.</p>
+<p>The only problem with the data is the times are to the second. If users placed pixels within the same second, it's possible that the order is going to be wrong. This is probably why my <a href="https://i.imgur.com/0NR4NRB.png">final frame</a> is slightly different from other published final frames.</p>
+<p>Here's my script to generate frames from the pixel data:</p>
+<p>{% codeblock lang:python render_place.py %}</p>
+<h1>!/usr/bin/python</h1>
+<p>import csv
+from PIL import Image, ImageDraw, ImageColor
+from multiprocessing import Pool</p>
+<p>def save_image(image,ts):
+    image.save('frames/{0}.png'.format(ts))</p>
+<h1>Hex color table</h1>
+<p>colors = ["#FFFFFF","#E4E4E4","#888888","#222222","#FFA7D1","#E50000","#E59500","#A06A42","#E5D900","#94E044","#02BE01","#00E5F0","#0083C7","#0000EA","#E04AFF","#820080"]</p>
+<h1>Convert the colors to RGB tuples</h1>
+<p>for i in range(0,len(colors)):
+    colors[i]=ImageColor.getrgb(colors[i])</p>
+<p>with Pool(processes=32) as pool:
+    with open ('sorted_pixels.csv') as csvfile:
+        reader = csv.DictReader(csvfile)
+        ts = 1490918687000
+        im = Image.new("RGB",(1001,1001),"white")
+        pixels = im.load()
+        for row in reader:
+            rowTimestamp = int(row['ts'])
+            for i in range(ts,rowTimestamp,1000):
+                pool.apply(save_image, args=(im, i,)) </p>
+<div class="highlight"><pre><span></span>        ts = rowTimestamp
+        pixels[int(row[&#39;x_coordinate&#39;]),int(row[&#39;y_coordinate&#39;])] = colors[int(row[&#39;color&#39;])]
+    pool.apply(save_image, args=(im,ts))
+</pre></div>
+
+
+<p>{% endcodeblock %}</p>
+<h1>Making the Video</h1>
+<p>After many hours, 16,559,898 pixel changes were converted into 320,048 PNG frames totaling 129GB. These frames can be <em>losslessly</em> composed into a 60fps mp4 using FFmpeg:</p>
+<div class="highlight"><pre><span></span>ffmpeg -f image2 -r 60 -pattern_type glob -i *&quot;.png&quot; -qp 0 -vf crop=1000:1000:0:0 Place-Timelapse.mp4
+</pre></div>
+
+
+<p>The resulting video is about 1.5 hours long, but may be interesting for anyone looking to build their own time lapses since it has <em>every</em> frame. You can <a href="https://mega.nz/#!MxIAiByD!_FcePrDFno-Gl2CqUcLwxzzVfD3uQLwexkVRR1UULDY">download it here</a>. Be advised that many video players have trouble playing lossless x264 video (especially at 60fps). You can use Ffmpeg to extract the individual frames if you need to. You'll need at least 130gb free! Alternatively you could generate them from the raw data using my Python script. That took about 24hrs on my i3-6300.</p>
+<div class="highlight"><pre><span></span>ffmpeg -i Place-Timelapse.mp4 frame_%10d.png
+</pre></div>
+
+
+<p>To make the version sped up 10x from that, I used:</p>
+<div class="highlight"><pre><span></span>ffmpeg -f image2 -r 600 -pattern_type glob -i *&quot;.png&quot; -qp 0 -vf crop=1000:1000:0:0,fps=60 Place-Timelapse10x.mp4
+</pre></div>
+
+
+<p>This is the one on YouTube, but you can download the lossless version too.</p>
+<h2>A note on scaling</h2>
+<p>Since this is pixel art, you want to be picky about what filter to use when scaling. I recommend using no interpolation, or nearest neighbor. This preserves 
+the hard edges in the art. In ffmpeg, use <code>-sws_flags neighbor</code>. For example, to make the 2000x2000 version for YouTube I used <code>-sws_flags neighbor -vf scale=iw*2:-1</code>.</p>
+<h1>Archive.org</h1>
+<p>I notice the <a href="https://archive.org/details/reddit-place-timelapse-daily-img-archive">data on Archive.org</a> is missing the first bits. I think a lot of folks built from that. Given that I have a more complete set of data I'm open to working with someone to preserve it, but I have no idea where to begin.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/ipv6-on-time-warner-spectrum.html" rel="bookmark"
+                           title="Permalink to "IPv6 on Time Warner / Spectrum"">"IPv6 on Time Warner / Spectrum"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-12-03T02:51:27-05:00">
+                Published: Sat 03 December 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I recently moved and had to give up my beloved Fioptics gigabit Internet service. They were great, but the only thing they are behind on is IPv6 deployment. In 2015 when I switched to Fioptics, I asked them about their IPv6 plan and got a vague answer along the lines …</p>
+                <a class="readmore" href="/ipv6-on-time-warner-spectrum.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/automate-wsus-server-cleanup-on-windows-server-2012-r2-with-powershell.html" rel="bookmark"
+                           title="Permalink to "Automate WSUS Server Cleanup on Windows Server 2012 R2 with PowerShell"">"Automate WSUS Server Cleanup on Windows Server 2012 R2 with PowerShell"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-10-11T12:11:01-04:00">
+                Published: Tue 11 October 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I recently wanted to automate cleanup of my WSUS server. A lot of posts around the web advocate using strange PowerShell scripts that make .NET calls to work with WSUS or even use third-party applications to do so. That information all seems outdated. On server 2012 R2 you only need …</p>
+                <a class="readmore" href="/automate-wsus-server-cleanup-on-windows-server-2012-r2-with-powershell.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/microsoft-visual-c-2012-redist-broken-after-windows-10-1607-upgrade.html" rel="bookmark"
+                           title="Permalink to "Microsoft Visual C++ 2012 Redist Broken After Windows 10 1607 Upgrade"">"Microsoft Visual C++ 2012 Redist Broken After Windows 10 1607 Upgrade"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-09-20T18:33:44-04:00">
+                Published: Tue 20 September 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I've been deploying the Windows 10 build 1607 feature upgrade (also known as the Anniversary Update) via WSUS to a test lab at work. The machines are upgrading from 1511. Today I was informed that Autodesk 3ds Max &amp; AutoCad would not launch on those machines. 3dsmax.exe gave an error …</p>
+                <a class="readmore" href="/microsoft-visual-c-2012-redist-broken-after-windows-10-1607-upgrade.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/i-created-my-first-chrome-theme.html" rel="bookmark"
+                           title="Permalink to "I created my first Chrome theme!"">"I created my first Chrome theme!"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-06-12T09:44:33-04:00">
+                Published: Sun 12 June 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I recently switch to Chrome from Firefox. I'm not sure how long I'll stay but I really missed Firefox's awesome dark <a href="https://wiki.mozilla.org/DevTools/Developer_Edition_Theme">Developer Edition Theme</a>. The Chrome web store was lacking an equivalent, so I made one! You can find it on the Chrome Web Store under the name, <a href="https://chrome.google.com/webstore/detail/developer-edition-dark/lglfmldlfmbbehalkgiglehhjblbfcjo">Developer Edition …</a></p>
+                <a class="readmore" href="/i-created-my-first-chrome-theme.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/running-exacqvision-dvr-server-on-hyper-v.html" rel="bookmark"
+                           title="Permalink to "Running ExacqVision DVR Server on Hyper-V"">"Running ExacqVision DVR Server on Hyper-V"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-07T10:16:23-04:00">
+                Published: Thu 07 April 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p><a href="https://exacq.com/">ExacqVision</a> is a DVR suite for security cameras. It works all right, I can't really complain on that front. However, they license their software based on the MAC address of the server. This is pretty stupid on its face because it means a failure of the NIC means you need …</p>
+                <a class="readmore" href="/running-exacqvision-dvr-server-on-hyper-v.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/fix-non-working-g930-headset-after-windows-10-upgrade.html" rel="bookmark"
+                           title="Permalink to "Fix non-working G930 headset after Windows 10 upgrade"">"Fix non-working G930 headset after Windows 10 upgrade"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-02-26T20:23:00-05:00">
+                Published: Fri 26 February 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I like my <a href="http://amzn.to/1Qj2vbV">Logitech G930 wireless headset</a>, but I also like running Windows 10 Preview builds. It seems like after every upgrade my headset stops working. I simply get no audio out of it. Reinstalling the application does not solve the problem. After every upgrade, I follow these steps to …</p>
+                <a class="readmore" href="/fix-non-working-g930-headset-after-windows-10-upgrade.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/how-to-use-cincinnati-bell-fioptics-with-your-own-router.html" rel="bookmark"
+                           title="Permalink to "How to use Cincinnati Bell Fioptics with your own router"">"How to use Cincinnati Bell Fioptics with your own router"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-09-23T12:37:33-04:00">
+                Published: Wed 23 September 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I recently purchased gigabit Fioptics Internet service from Cincinnati Bell. At first I was hesitant to go through with it. I did not want to use a crappy ISP router and forgo my wonderful <a href="http://amzn.to/1jadh79">ASUS RT-N66U</a> or be stuck running some sort of NAT-behind-NAT nightmare network. The day after installation …</p>
+                <a class="readmore" href="/how-to-use-cincinnati-bell-fioptics-with-your-own-router.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/results-of-the-2015-rlinux-distribution-survey.html" rel="bookmark"
+                           title="Permalink to "Results of the 2015 /r/Linux Distribution Survey"">"Results of the 2015 /r/Linux Distribution Survey"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-08-24T19:43:06-04:00">
+                Published: Mon 24 August 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Introduction</h1>
+<p>About three years ago after seeing a failed comment survey on /r/Linux I decided to create a "real" survey using Google docs to find out what Linux Distributions the folks at /r/Linux were using. These past three years, the results of those surveys were very well received …</p>
+                <a class="readmore" href="/results-of-the-2015-rlinux-distribution-survey.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/hardening-firefox-to-protect-privacy.html" rel="bookmark"
+                           title="Permalink to "Hardening Firefox to Protect Privacy"">"Hardening Firefox to Protect Privacy"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-08-11T17:40:39-04:00">
+                Published: Tue 11 August 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Your web browser is your gateway to the Internet. Unfortunately, sometimes the gate works both ways. In this guide I will cover some tricks to help protect yourself online. I have been using Firefox configured like this for quite a while and wanted to share this with you. I'll admit …</p>
+                <a class="readmore" href="/hardening-firefox-to-protect-privacy.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/deploy-application-updates-with-ninite-with-a-cache-on-your-lan.html" rel="bookmark"
+                           title="Permalink to "Deploy Application Updates with Ninite with a Cache on your LAN"">"Deploy Application Updates with Ninite with a Cache on your LAN"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-01-23T13:10:47-05:00">
+                Published: Fri 23 January 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Recently we purchased <a href="https://ninite.com/pro">Ninite Pro</a> for our organization and have implemented silent application updating via a scheduled task with PowerShell. This process uses a cache on our LAN to store updates and speed the whole process along. After some thinking I decided I wanted to get this working off-site so …</p>
+                <a class="readmore" href="/deploy-application-updates-with-ninite-with-a-cache-on-your-lan.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/enable-bitlocker-disk-encryption-via-scheduled-task.html" rel="bookmark"
+                           title="Permalink to "Enable Bitlocker Disk Encryption Via Scheduled Task"">"Enable Bitlocker Disk Encryption Via Scheduled Task"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-10-07T10:26:47-04:00">
+                Published: Tue 07 October 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Enable Bitlocker Disk Encryption Via Scheduled Task</p>
+<p>I've been working on deploying Bitlocker across our Active Directory domain via a scheduled task. My goals here were as such:</p>
+<ul>
+<li>Enable encryption on any platform which is capable of running it.</li>
+<li>Prepare the disk for encryption (if necessary).</li>
+<li>On some of our …</li></ul>
+                <a class="readmore" href="/enable-bitlocker-disk-encryption-via-scheduled-task.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/schedule-a-task-to-update-shadowprotect-after-hours.html" rel="bookmark"
+                           title="Permalink to "Schedule a Task to Update ShadowProtect After Hours"">"Schedule a Task to Update ShadowProtect After Hours"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-10-03T13:47:10-04:00">
+                Published: Fri 03 October 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Recently I needed to deploy some updates to some computers running <a href="http://www.storagecraft.com/products/overviews/storagecraft-shadowprotect">StorageCraft ShadowProtect</a>. In doing this, I was faced with three problems:</p>
+<ol>
+<li>After installing the update, backups cannot be performed until you reboot.</li>
+<li>I cannot reboot the servers during work hours.</li>
+<li>I am going out of town this evening to …</li></ol>
+                <a class="readmore" href="/schedule-a-task-to-update-shadowprotect-after-hours.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/remove-all-drivers-from-a-windows-image-by-a-certain-vendor.html" rel="bookmark"
+                           title="Permalink to "Remove All Drivers from a Windows Image by a Certain Vendor"">"Remove All Drivers from a Windows Image by a Certain Vendor"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-07-30T18:23:29-04:00">
+                Published: Wed 30 July 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>For when you find that you just need to remove <em>all</em> of the drivers from a captured image, or only those of certain makes. PowerShell makes it easy to script this removal so you aren't manually typing a ton of dism commands. I found myself needing to purge some problematic …</p>
+                <a class="readmore" href="/remove-all-drivers-from-a-windows-image-by-a-certain-vendor.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/results-of-the-2014-rlinux-distribution-survey.html" rel="bookmark"
+                           title="Permalink to "Results of the 2014 /r/Linux Distribution Survey"">"Results of the 2014 /r/Linux Distribution Survey"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-05-18T18:31:48-04:00">
+                Published: Sun 18 May 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <h2>Introduction</h2>
+<p>About two years ago, after seeing a failed comment survey on /r/Linux I decided to create a "real" survey using Google Docs to find out what Linux distributions (distros) the folks at /r/Linux were using. These past two years, the results of those surveys were very well …</p>
+                <a class="readmore" href="/results-of-the-2014-rlinux-distribution-survey.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/getting-adobe-creative-cloud-enterprise-to-install-from-a-network-share.html" rel="bookmark"
+                           title="Permalink to "Getting Adobe Creative Cloud Enterprise to Install from a Network Share"">"Getting Adobe Creative Cloud Enterprise to Install from a Network Share"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-04-02T13:19:04-04:00">
+                Published: Wed 02 April 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I've been fighting geting Adobe Creative Cloud to install properly from a LiteTouch deployment share. In my troubleshooting, I was always able to install the exceptions just fine, but the MSI package created by Adobe's Creative Cloud Packager would not run successfully from a network share. When I tried to …</p>
+                <a class="readmore" href="/getting-adobe-creative-cloud-enterprise-to-install-from-a-network-share.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/getting-away-from-self-hosted.html" rel="bookmark"
+                           title="Permalink to "Getting away from self-hosted"">"Getting away from self-hosted"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-10T14:00:25-04:00">
+                Published: Mon 10 March 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Well, that was short-lived. After running my webserver on my home connection for about a day I got a little paranoid about what heavy web traffic might do to me if I were playing an online game such as League of Legends or Diablo III. I know it probably would …</p>
+                <a class="readmore" href="/getting-away-from-self-hosted.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/f1rst-p0st.html" rel="bookmark"
+                           title="Permalink to "F1rst P0st!"">"F1rst P0st!"</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-03-09T16:03:30-04:00">
+                Published: Sun 09 March 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Out of boredom today I decided to kick togther a web server that I could host my own blog on. I plan on putting my musings and reflections on technical problems I encounter in my daily work. I've found that often I work on something quite complex and come up …</p>
+                <a class="readmore" href="/f1rst-p0st.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

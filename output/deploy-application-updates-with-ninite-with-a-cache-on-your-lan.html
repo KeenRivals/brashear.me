@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Deploy Application Updates with Ninite with a Cache on your LAN"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/deploy-application-updates-with-ninite-with-a-cache-on-your-lan.html" rel="bookmark"
+           title="Permalink to "Deploy Application Updates with Ninite with a Cache on your LAN"">"Deploy Application Updates with Ninite with a Cache on your LAN"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-01-23T13:10:47-05:00">
+                Published: Fri 23 January 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p>Recently we purchased <a href="https://ninite.com/pro">Ninite Pro</a> for our organization and have implemented silent application updating via a scheduled task with PowerShell. This process uses a cache on our LAN to store updates and speed the whole process along. After some thinking I decided I wanted to get this working off-site so that when students take their laptops home over the summer, they can continue to receive updates.</p>
+<!-- more -->
+
+<h1>Overview</h1>
+<p>The goal here is to cover two update scenarios:</p>
+<ol>
+<li>When on-site, update from our cache on the LAN.</li>
+<li>When off-site, update without a cache.</li>
+</ol>
+<p>To accomplish this, we deploy a PowerShell script and a copy of Ninite Pro to the computers' C:\Windows\Temp directory. From there a scheduled task runs daily to run the PowerShell script. The script checks for the availability of a local cache and if that's not available it updates without it. Ninite will save a report for the computer to your server's <em>Reports</em> directory.</p>
+<h1>Configure your on-site cache and report folder</h1>
+<p>For your on-site cache to work via this method, you need to create a network folder which is accessible to the computers in your domain. In that folder, you need two special directories: <em>Cache</em> and <em>Reports</em> which are writable by your <em>Domain Computers</em> Active Directory group. This is necessary so that computers can cache their downloads and save their reports. Your directory tree will look something like this:</p>
+<ul>
+<li><code>\\example.com\Ninite\</code><ul>
+<li><strong>Cache\</strong> - Directory writeable by Domain Computers group.</li>
+<li><strong>Reports\</strong> - Directory writeable by Domain Computers group.</li>
+<li><strong>Ninite-Offsite.ps1</strong> - PowerShell script for deployment.</li>
+<li><strong>NinitePro.exe</strong> - Ninite Pro installer.</li>
+</ul>
+</li>
+</ul>
+<h1>Configure Ninite-Update.ps1</h1>
+<p>The script below is what enables the magic. In summary, it tests if it can connect to your file server, <em>file.example.com</em>. If it can, it updates applications using the installer and cache on the server. If it cannot access your file server, it updates from C:\Windows\temp\Ninite instead. We will use a GPO to push <em>NinitePro.exe</em> and <em>Ninite-Offsite.ps1</em> to C:\Windows\temp a little later.</p>
+<p>In this script, Ninite is run in update-only mode for specifically listed applications. The installer will prevent the creation of shortcuts and auto-update functions by the installed applications.</p>
+<p>{% codeblock Ninite-Update.ps1 - Ninite-Update.ps1 %}</p>
+<h1>Ninite Pro App Selection List</h1>
+<h1>https://ninite.com/applist/pro.html</h1>
+<p>Set-Variable APPS -option constant -value '"7-Zip" QuickTime Acrobat Air Audacity Firefox Flash "Flash (IE)" "Google Drive" "Google Earth" GIMP Inkscape Java "KeePass 2" "Notepad++" Reader Shockwave SumatraPDF VLC'</p>
+<p>function updateOnsite ($apps) {
+    $dir = "\example.com\Ninite"
+    Push-Location $dir</p>
+<div class="highlight"><pre><span></span>&amp; .\NinitePro.exe /silent $dir\Reports\$env:computername.txt /updateonly /select $apps /cachepath $dir\Cache /disableautoupdate /disableshortcuts
+</pre></div>
+
+
+<p>} </p>
+<p>function updateOffsite($apps) {
+    $dir = "C:\Windows\temp\Ninite\"
+    Push-Location $dir</p>
+<div class="highlight"><pre><span></span>&amp; .\NinitePro.exe /silent $dir\$env:computername.txt /updateonly /select $apps /disableautoupdate /disableshortcuts
+</pre></div>
+
+
+<p>}</p>
+<p>function main () {
+    if (Test-Connection file.example.com -quiet) {
+        updateOnsite $APPS
+    } elseif (Test-Path "C:\Windows\Temp\Ninite\NinitePro.exe" ){
+        updateOffsite $APPS
+    }
+}</p>
+<p _="%" endcodeblock>main</p>
+<p>You need to customize this script to fit your environment. </p>
+<ol>
+<li><strong>Line 3</strong>: Customize this list with the applications you wish to update.</li>
+<li><strong>Line 8</strong>: Change this to your Ninite installer folder.</li>
+<li><strong>Line 22</strong>: Change <em>file.example.com</em> to your file server's hostname.</li>
+</ol>
+<h1>Create a GPO to deploy Ninite Pro and Schedule Updating</h1>
+<ol>
+<li>In Group Policy Management, create a new policy named <em>Update Applications with Ninite</em>. </li>
+<li>Go to <strong>Computer Configuration</strong> &gt; <strong>Preferences</strong> &gt; <strong>Windows Settings</strong> &gt; <strong>Files</strong>.</li>
+<li>Right-click and choose <em>New</em> &gt; <em>File</em>.</li>
+<li>Set <em>Action</em> to <strong>Replace</strong>. </li>
+<li>Set the source file to <strong><code>\\example.com\Ninite\NinitePro.exe</code></strong>.</li>
+<li>Set the destination file to C:\Windows\Temp\Ninite\NinitePro.exe.</li>
+<li>Click <strong>OK</strong>.</li>
+<li>Right-click and choose <strong>New</strong> &gt; *<em>File</em>.</li>
+<li>Set <em>Action</em> to <strong>Replace</strong>. </li>
+<li>Set the source file to <strong><code>\\example.com\Ninite\Ninite-Offsite.ps1</code></strong>.</li>
+<li>Set the destination file to <strong>C:\Windows\Temp\Ninite\Ninite-Offsite.ps1</strong>.</li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+<p>Now you just need to create a scheduled task to run Ninite-Offsite.ps1. The goal is that the task should run once a day during an eight hour window (while the kids are at school) between 7am and 3pm.</p>
+<ol>
+<li>Viewing the GPO, go to <strong>Computer Configuration</strong> &gt; <strong>Control Panel Settings</strong> &gt; <strong>Scheduled Tasks</strong>.</li>
+<li>Right-click in the window and choose <strong>New</strong> &gt; <strong>Scheduled Task (At least Windows 7)</strong>.</li>
+<li>On the <em>General</em> tab:<ol>
+<li>Set the name to <strong>Ninite-Update</strong>.</li>
+<li>Run the task as <strong>NT AUTHORITY\System</strong>. Check <strong>Run with highest privileges</strong>.</li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+</li>
+<li>On the <em>Triggers</em> tab, create a new trigger:<ol>
+<li>Begin the task on a schedule.</li>
+<li>Run the task daily.</li>
+<li>Set the start for today @ 7am. </li>
+<li>Delay the task for up to 8 hours.</li>
+<li>Make sure the <strong>Enabled</strong> box is checked.</li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+</li>
+<li>On the <em>Actions</em> tab, create a new action:<ol>
+<li>The action should be <strong>Start a program</strong>.</li>
+<li>Program/script: <strong>powershell</strong></li>
+<li>Add arguments: <strong>-ExecutionPolicy Bypass -file C:\Windows\Temp\Ninite\Ninite-Offsite.ps1</strong></li>
+<li>Click <strong>OK</strong>.</li>
+</ol>
+</li>
+<li>On the <em>Conditions</em> tab, check the <strong>Start only if the following network connection is available</strong> then select <strong>Any connection</strong>.</li>
+<li>On the <em>Settings</em> tab:<ol>
+<li>Check <strong>Allow task to be run on demand</strong>. This helps with testing.</li>
+<li>Check <strong>Run task as soon as possible after a scheduled start is missed</strong>. This makes it so if a PC is offline during a scheduled start, it starts ASAP when it comes back online.</li>
+</ol>
+</li>
+<li>Click <strong>OK</strong>. Your task is ready.</li>
+</ol>
+<p>From here you are ready to test.</p>
+<h1>Testing your scheduled task</h1>
+<p>You can test your Ninite deployment task by opening up the Windows Task Scheduler and finding your scheduled task. If you right-click the task you can run it on demand. Check <code>\\example.com\Ninite\Reports\</code> for a log indicating success. Ninite logs normally list what applications were updated. If the log contains only <strong>OK</strong>, then no apps were available for update.</p>
+<h2>Common Issues</h2>
+<p>When I was setting this up I ran into some problems. If you have trouble, try checking these first:</p>
+<ul>
+<li>Make sure the permissions on your file share are correct. The <em>computer account</em> needs access to the file share when you run a task as <em>NT AUTHORITY\System</em>.</li>
+<li>Make sure your destination files are explicitly set in your GPO. Copying <em><code>\\example.com\Ninite\NinitePro.exe</code></em> to C:\Windows\Temp\Ninite doesn't do what you expect! You need to specify the destination file name!</li>
+</ul>
+<p>Good luck out there!</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

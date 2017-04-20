@@ -1,0 +1,11 @@
+---
+layout: post
+title: "F1rst P0st!"
+date: 2014-03-09 16:03:30 -0400
+comments: true
+categories: 
+---
+
+Out of boredom today I decided to kick togther a web server that I could host my own blog on. I plan on putting my musings and reflections on technical problems I encounter in my daily work. I've found that often I work on something quite complex and come up with a solution, then I promptly forget the struggle in getting there. I feel like this troubleshooting experience is worthy of writing down sometimes. The idea is to help me recollect the process I used to arrive at a particular solution, and perhaps help any Internet folks out there trying to accomplish the same thing.
+
+I'll try to stick to this and write whenever I have something worthy. I'm using [Octopress](http://octopress.org/) to manage this blog. I'm not particularly great at ruby or git, but this should serve as a nice learning opportunity for me.

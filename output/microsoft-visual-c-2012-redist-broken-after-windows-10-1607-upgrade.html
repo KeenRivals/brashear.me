@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Microsoft Visual C++ 2012 Redist Broken After Windows 10 1607 Upgrade"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/microsoft-visual-c-2012-redist-broken-after-windows-10-1607-upgrade.html" rel="bookmark"
+           title="Permalink to "Microsoft Visual C++ 2012 Redist Broken After Windows 10 1607 Upgrade"">"Microsoft Visual C++ 2012 Redist Broken After Windows 10 1607 Upgrade"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-09-20T18:33:44-04:00">
+                Published: Tue 20 September 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p>I've been deploying the Windows 10 build 1607 feature upgrade (also known as the Anniversary Update) via WSUS to a test lab at work. The machines are upgrading from 1511. Today I was informed that Autodesk 3ds Max &amp; AutoCad would not launch on those machines. 3dsmax.exe gave an error: <em>"The procedure entry point __crtCreateSymbolicLinkW could not be located in the dynamic link library C:\WINDOWS\SYSTEM32\MSVCP110.dll."</em> </p>
+<!-- more -->
+
+<h1>Cause</h1>
+<p>It seems like the in-place upgrade breaks the installed MS VC++ 2012 libs by replacing them with weird versions. The only evidence I can find online is <a href="https://support.microsoft.com/en-us/kb/3119142" title="Update for Microsoft Visual C++ 2012 Update 4 Redistributable Package">KB3119142</a> from January 2016 which specifically mentions this sort of error with Windows 10. That update supposedly fixes the issue, but there's a lot of <a href="http://news.softpedia.com/news/microsoft-acknowledges-kb3119142-update-repeated-install-issues-provides-fix-501036.shtml" title="Microsoft Acknowledges KB3119142 Update Repeated Install Issues, Provides Fix">griping online about that update</a> causing problems. I can't find that update on my WSUS server, so I'm not sure if it's even available for or applicable for Windows 10 build 1607. It you have any idea on that one, please <a href="mailto:web@brashear.me">let me know</a>! The KB article recommends running a repair install to fix the issue. I can work with that.</p>
+<h1>Resolution</h1>
+<p>To fix the issue, I created an immediate scheduled task which runs the <a href="https://www.microsoft.com/en-us/download/details.aspx?id=30679" title="Visual C++ Redistributable for Visual Studio 2012 Update 4">Visual C++ Redist Installers</a> in repair mode. I used a WMI filter on my Group Policy Object to make the task run only on Windows 10 build 1607 machines.</p>
+<h2>The Scheduled Task</h2>
+<p>Create a GPO which creates an immediate scheduled task. Create a folder on the network available to your machines with the redistributable installers from the link above: <em>vcredist_x86.exe</em>, and <em>vcredist_x64.exe</em>. Create an action to run <code>vcredist_x86.exe /repair /quiet /norestart</code> and then <code>vcredist_x64.exe /repair /quiet /norestart</code> to repair the installation. <em>Technically</em> a reboot is needed to complete the install, but the issue is resolved without a reboot. I elect to not reboot because I figure the machines will reboot eventually and I don't want to interrupt someone using the machine.</p>
+<h2>The WMI Filter</h2>
+<p>Since I want this to <em>only</em> run on Windows 10 1607. I needed the following WMI filter on my GPO. Namespace <code>root\CIMv2</code> with the query <code>Select BuildNumber from Win32_OperatingSystem WHERE BuildNumber = 14393</code> does the job.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Remove All Drivers from a Windows Image by a Certain Vendor"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/remove-all-drivers-from-a-windows-image-by-a-certain-vendor.html" rel="bookmark"
+           title="Permalink to "Remove All Drivers from a Windows Image by a Certain Vendor"">"Remove All Drivers from a Windows Image by a Certain Vendor"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-07-30T18:23:29-04:00">
+                Published: Wed 30 July 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p>For when you find that you just need to remove <em>all</em> of the drivers from a captured image, or only those of certain makes. PowerShell makes it easy to script this removal so you aren't manually typing a ton of dism commands. I found myself needing to purge some problematic Intel drivers from an image in order to get USB working on some of our older machines. I found that it is possible to remove all drivers from a mounted Windows image and then commit the changes back to the captured WIM completely in PowerShell. Read on if you need the skinny.</p>
+<!-- more -->
+
+<h2>Introduction</h2>
+<p>It's summer time, so naturally I am rebuilding our Windows images for the coming school year. This year we are moving from Windows 7 to Windows 8.1. While we haven't had many issues with incompatible software (Infocus LiteShow, which is garbage on anything other than Windows XP anyways). We have had a lot of problems with getting reliable Windows 8.1 drivers for all of our fleet--which ranges from 5-years-old HP EliteBook 2730p units to brand-spankin' new Lenovo ThinkPad Yoga S1 devices. Naturally, getting Windows 8.1 to run happily on these older devices is complicated by the tendency of <abbr title="Original Equipment Manufacturer">OEM</abbr>s to stop producing drivers for any OS other than the one those in vogue when the device was released. In my tinkering with both <abbr title="Microsoft Deployment Toolkit">MDT</abbr> 2012 and <abbr title="Windows Deployment Services">WDS</abbr> somehow I got some bad Intel chipset drivers in my image that were being used instead of the ones I wanted and causing USB peripherals (but not USB storage) to be nonfunctional. The solution was to purge all of these Intel drivers from my captured WIM files using PowerShell.</p>
+<p>Microsoft provides some fairly good documentation on <a href="http://technet.microsoft.com/en-us/library/hh825010.aspx">using DISM within PowerShell</a>. It's definitely worth a looking over. It will help you understand the commands we're using here if you are already familiar with DISM.</p>
+<h3>Requirements</h3>
+<ul>
+<li>You need to be running Windows PowerShell 4.0.</li>
+<li>You need the latest Windows Assessment and Deployment Kit installed.</li>
+</ul>
+<p>You may also need to import the DISM PowerShell module. There are instructions to <a href="http://technet.microsoft.com/en-us/library/hh825010.aspx">prepare the DISM PowerShell Environment available from Microsoft</a> (scroll down), but in my case it was already set up.</p>
+<h2>Example Scenario</h2>
+<p>In my example scenario, I have a WIM, <em>2730p.wim</em> from which I want to remove <em>all</em> of the Intel chipset drivers that were injected into the image at an earlier point in time. I will mount the WIM to D:\Image, and do all of my work there.</p>
+<p>Be advised that you need to run PowerShell as an administrator. If you're not running <abbr title="PowerShell">PS</abbr> with admin rights, none of the important bits here will work. You've been warned!</p>
+<h2>Mount your Windows Image with PowerShell</h2>
+<p>Mounting Windows images with PowerShell is handled by <code>mount-windowsimage</code>. In our example, run the following: </p>
+<p _="%" endcodeblock>{% codeblock lang:ps1 Mount a Windows image with PowerShell %}
+mount-windowsimage -ImagePath D:\2730p.wim -Path D:\Image -Index 1</p>
+<p>Now, wait while it is mounted. If the <code>mount-windowsimage</code> cmdlet is not available, make sure you have met the requirements listed above. Once the image is mounted, continue to the next step.</p>
+<h2>Get a List of Third-Party Drivers in the Windows Image</h2>
+<p>Here, we will get a list of all of the drivers in the image and store it in a variable. I like to store it in a variable because fetching the installed drivers takes a long time and I'm a bit impatient so I don't want to wait each time I work with the list of drivers. To fetch a list of installed drivers from the image, use the <code>get-windowsdriver</code> command. I stored the result in a variable with:</p>
+<p _="%" endcodeblock>{% codeblock lang:ps1 Get a list of drivers in an image with PowerShell %} 
+$drivers = get-windowsdriver -path D:\Image</p>
+<p>From here, it's a good idea to browse the list of drivers in the image to find out what drivers you want to remove. Type <code>$drivers</code> followed by enter and you'll get a (long) list. </p>
+<h2>Remove Third-Party Drivers by a Certain Vendor from a Windows Image</h2>
+<p>Next, I want to use my <code>$drivers</code> variable and a little filtering to nuke all Intel drivers from the image. To do the filtering, we will use <code>where-object</code>, then for the removing we will pipe the output to <code>remove-windowsdriver</code>. Through the magic of PowerShell, the passed objects will be removed from the image one by one. </p>
+<p>If you want to remove the drivers by a different vendor, take note of the "Provider Name" property for those drivers and use that. In my example I filter by ProviderName, but you could filter by <em>any</em> of the properties available with the where-object command. Some handy ones might be <code>ClassName</code> or <code>BootCritical</code>. See the examples below.</p>
+<p>{% codeblock lang:ps1 Remove all Intel drivers from the Windows image %} </p>
+<h1>Remove all Intel drivers from the image</h1>
+<p>$drivers | where-object {$_."ProviderName" -eq 'Intel' }  | Remove-WindowsDriver -Path D:\Image</p>
+<h1>Alternatively, remove all drivers from the image</h1>
+<p _="%" endcodeblock>$drivers | Remove-WindowsDriver -Path D:\Image</p>
+<p>Once you're done, you can check what drivers are left in the image with:</p>
+<p _="%" endcodeblock>{% codeblock lang:ps1 Get a list of drivers remaining in the image %} 
+$drivers = get-windowsdriver -path D:\Image</p>
+<p>If everything is good, you are free to commit the image.</p>
+<h2>Commit Changes to a Windows Image with PowerShell</h2>
+<p>Unmounting (and committing) an image is completed with the <code>dismount-windowsimage</code> command, as below.</p>
+<p>{% codeblock lang:ps1 Dismount a Windows image with PowerShell %}</p>
+<h1>If you don't want to save the changes, use the -discard option.</h1>
+<p _="%" endcodeblock>Dismount-WindowsImage -Path D:\Image -save</p>
+<p>From here, you have a nice clean Windows image! No more unruly drivers!</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

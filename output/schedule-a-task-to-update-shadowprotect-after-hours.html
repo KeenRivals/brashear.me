@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>"Schedule a Task to Update ShadowProtect After Hours"</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Fighting the System </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/schedule-a-task-to-update-shadowprotect-after-hours.html" rel="bookmark"
+           title="Permalink to "Schedule a Task to Update ShadowProtect After Hours"">"Schedule a Task to Update ShadowProtect After Hours"</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2014-10-03T13:47:10-04:00">
+                Published: Fri 03 October 2014
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/webbrashearme.html">web@brashear.me</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+
+</footer><!-- /.post-info -->      <p>Recently I needed to deploy some updates to some computers running <a href="http://www.storagecraft.com/products/overviews/storagecraft-shadowprotect">StorageCraft ShadowProtect</a>. In doing this, I was faced with three problems:</p>
+<ol>
+<li>After installing the update, backups cannot be performed until you reboot.</li>
+<li>I cannot reboot the servers during work hours.</li>
+<li>I am going out of town this evening to see my girlfriend and I don't want to update remotely.</li>
+</ol>
+<p>The solution here is a little automation with the help of a little batch and <code>schtasks</code> on my workstation.</p>
+<!-- more -->
+
+<h1>Silently Installing ShadowProtect</h1>
+<p><a href="http://www.storagecraft.com/support/kb/article/200">StorageCraft's documentation</a> on silently installing ShadowProtect is worth a read. The most important parameter is <em>OMIT</em>. The <em>OMIT</em> parameter specifies which products you wish to install. If you only want the backup capability on this machine, you can omit everything except <em>Agent</em> (as I do). Delete OMIT parameters for features you want. Using this information, I've now got a batch file that will install ShadowProtect on a server and reboot it:</p>
+<p>{% codeblock lang:bat Update-ShadowProtect.bat %}
+pushd %~dp0</p>
+<p _="%" endcodeblock>start /wait ShadowProtectSetup_5.2.0.exe install IACCEPT=STORAGECRAFT.EULA LANG=en OMIT=Console OMIT=Mount OMIT=VirtualBoot
+shutdown /r /t 30</p>
+<p>This script will run <em>ShadowProtectSetup_5.2.0.exe</em> from the script's directory in silent mode and install <em>only</em> the agent. To deploy using this script, copy it to a share accessible by your server(s), and then you can proceed with scheduling a task to deploy it. In my example, I've got the deployment script and installer at "\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat".</p>
+<h1>Using Schtasks to Schedule a Task to Deploy ShadowProtect</h1>
+<p>The <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb736357%28v=vs.85%29.aspx">schtasks</a> tool is the magic here. It allows me to schedule processes that will run on a remote computer at whatever time I specify. The template command we will use is the following:</p>
+<p _="%" endcodeblock>{% codeblock lang:bat %}
+schtasks /create /S server /tn "Install ShadowProtect" /tr "\"\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat" /sc once /st 20:00 /ru "System"</p>
+<p>This tells <code>schtasks</code> to create on <strong>server</strong> a task called <strong>Install ShadowProtect</strong> that runs the command <strong>\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat</strong> <strong>once</strong> at <strong>20:00</strong> (8pm) local time as the <strong>System</strong> account. For each of our servers, replace <em>server</em> with the server name and the task will be scheduled. Note that this will only work if:</p>
+<ul>
+<li>Your firewall doesn't block the task scheduler RPC server.</li>
+<li>The path for your <em>install.bat</em> script is accessible to the server's computer account.</li>
+<li>The time 20:00, is <em>after</em> the current time. I've noticed that since we did not specify a startdate with <em>/sd</em>, if the time is before the time you run the command (even if it's midnight) schtasks will complain. If you want this task to run at midnight the next day, you will need to specify <em>/sd</em> in the command (see the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb736357%28v=vs.85%29.aspx">schtasks reference</a> for details.</li>
+<li>Your server is Windows Server 2008 or later. I've had Windows Server 2003 hosts not like the specification of the SYSTEM user for schtasks. The way I got it to work was to create the task manually on those hosts, but there may be some other workaround (thankfully, I don't have many 2k3 hosts).</li>
+</ul>
+<p>Check the output from the schtasks command, and if it does not complain you can expect your task to run as scheduled. I highly recommend starting with a test host or two and creating the task for 1-2 minutes in the future so you can verify your program/script runs correctly. Once you have that ironed out, it's safe to deploy to your other servers.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
