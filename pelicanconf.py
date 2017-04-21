@@ -2,11 +2,27 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = 'web@brashear.me'
+AUTHOR = 'root'
 SITENAME = 'Fighting the System'
 SITEURL = ''
 
 PATH = 'content'
+
+DEFAULT_CATEGORY = 'Blog'
+
+# Clean the output directory each time we regenerate the site
+DELETE_OUTPUT_DIRECTORY = True
+
+STATIC_PATHS = ['images','files']
+
+THEME = 'themes/feather'
+
+# Plugin settings
+PLUGIN_PATHS = ['plugins']
+PLUGINS = ['sitemap']
+
+# Sitemap settings
+SITEMAP = { 'format': 'xml' }
 
 TIMEZONE = 'America/New_York'
 
@@ -20,16 +36,12 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Pelican', 'http://getpelican.com/'),
-         ('Python.org', 'http://python.org/'),
-         ('Jinja2', 'http://jinja.pocoo.org/'),
-         ('You can modify those links in your config file', '#'),)
+LINKS = ()
 
 # Social widget
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
+SOCIAL = ()
 
 DEFAULT_PAGINATION = False
 
 # Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+RELATIVE_URLS = True
