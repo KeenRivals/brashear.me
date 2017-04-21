@@ -1,10 +1,6 @@
----
-layout: post
-title: "Enable Bitlocker Disk Encryption Via Scheduled Task"
+title: Enable Bitlocker Disk Encryption Via Scheduled Task
 date: 2014-10-07 10:26:47 -0400
-comments: true
-categories: windows bitlocker deployment
----
+tags: windows, bitlocker, deployment
 
 Enable Bitlocker Disk Encryption Via Scheduled Task
 
@@ -19,8 +15,7 @@ The advantage of using a scheduled task to enable Bitlocker (versus a startup or
 
 <!-- more -->
 
-Prepare the Script
-==================
+# Prepare the Script
 
 We only have two vendors worth of laptops in our environment: Lenovo and HP. Our Lenovos are all ThinkPad Yoga units, which are capable of running Bitlocker already. The HPs (EliteBook 2730p, 2740p, and 2760p units) were not configured correctly by me when imaged, and so I need to tweak them before I can enable encryption. Namely, they:
 
@@ -41,88 +36,85 @@ Note:
  * Before doing this you should have already set up your group policies so that Bitlocker keys are automatically backed up to Active Directory.
  * This script uses the Get-TPM cmdlet, which is only available on Windows 8.1 (I believe). If you are using Windows 7 or Windows 8, you will need to use WMI. I chose to use the cmdlet because everyone here is on Windows 8.1 and I find WMI to be kind of gross.
 
-{% codeblock lang:ps1 Enable-Bitlocker.ps1 %}
-# Name:	Enable-Bitlocker.ps1
-# Usage: Enable-Bitlocker.ps1
-# Description: 
-#	Enables the Trusted Platform Module (TPM) on HP EliteBook machines so that 
-#	Bitlocker encryption with TPM unlock can be used. It can also prepare the 
-#	disk drive on HPs for encryption.
-#
-#	If conditions are correct, encrypt the drive.
+		:::powershell
+		
+		# Name:	Enable-Bitlocker.ps1
+		# Usage: Enable-Bitlocker.ps1
+		# Description: 
+		#	Enables the Trusted Platform Module (TPM) on HP EliteBook machines so that 
+		#	Bitlocker encryption with TPM unlock can be used. It can also prepare the 
+		#	disk drive on HPs for encryption.
+		#
+		#	If conditions are correct, encrypt the drive.
 
-# Returns the directory from which the script is running.
-function Get-ScriptDirectory {
-	$Invocation = (Get-Variable MyInvocation -Scope 1).Value
-	Split-Path $Invocation.MyCommand.Path
-}
+		# Returns the directory from which the script is running.
+		function Get-ScriptDirectory {
+			$Invocation = (Get-Variable MyInvocation -Scope 1).Value
+			Split-Path $Invocation.MyCommand.Path
+		}
 
-pushd (get-scriptDirectory)
+		pushd (get-scriptDirectory)
 
-# Get the target volume's encryption properties.
-$volume = Get-WmiObject win32_EncryptableVolume `
-	-Namespace root\CIMv2\Security\MicrosoftVolumeEncryption `
-	-Filter "DriveLetter = 'C:'"
+		# Get the target volume's encryption properties.
+		$volume = Get-WmiObject win32_EncryptableVolume `
+			-Namespace root\CIMv2\Security\MicrosoftVolumeEncryption `
+			-Filter "DriveLetter = 'C:'"
 
-# Get the target system's manufacturer.	
-$manufacturer = (get-wmiobject win32_computersystem).Manufacturer
+		# Get the target system's manufacturer.	
+		$manufacturer = (get-wmiobject win32_computersystem).Manufacturer
 
-# If the manufacturer is HP, and the volume is not encrypted, prepare it.
-if ( $manufacturer -eq "Hewlett-Packard" -and ( $volume.encryptionmethod -eq 0 -or !$volume) ) {
-	
-	$tpm = get-TPM
-	
-	# Is the TPM not enabled? Enable it.
-	if ( $tpm.TpmReady -eq $false ) {
-		.\BiosConfigUtility64.exe /SetConfig:Enable-TPM.cfg /cspwd:biospassword /cspwd:""
-	} 
-	
-	# Is there not an encryptable volume? Make C: encryptable with bdehdcfg.
-	if ( -not $volume ) {
-		bdehdcfg -target default -quiet
-	} 
-	
-	# Is the TPM ready and the volume encryptable? Encrypt it.
-	if ($tpm.TpmReady -eq $true -and $volume ) {
-		manage-bde -on c: -s -rp
-	}	
-} 
+		# If the manufacturer is HP, and the volume is not encrypted, prepare it.
+		if ( $manufacturer -eq "Hewlett-Packard" -and ( $volume.encryptionmethod -eq 0 -or !$volume) ) {
+			
+			$tpm = get-TPM
+			
+			# Is the TPM not enabled? Enable it.
+			if ( $tpm.TpmReady -eq $false ) {
+				.\BiosConfigUtility64.exe /SetConfig:Enable-TPM.cfg /cspwd:biospassword /cspwd:""
+			} 
+			
+			# Is there not an encryptable volume? Make C: encryptable with bdehdcfg.
+			if ( -not $volume ) {
+				bdehdcfg -target default -quiet
+			} 
+			
+			# Is the TPM ready and the volume encryptable? Encrypt it.
+			if ($tpm.TpmReady -eq $true -and $volume ) {
+				manage-bde -on c: -s -rp
+			}	
+		} 
 
-# If this is a Lenovo machine that is not encrypted, encrypt it.
-if ( $manufacturer -eq "LENOVO" -and $volume.encryptionmethod -eq 0 ) {
-	manage-bde -on c: -s -rp
-}
-{% endcodeblock %}
+		# If this is a Lenovo machine that is not encrypted, encrypt it.
+		if ( $manufacturer -eq "LENOVO" -and $volume.encryptionmethod -eq 0 ) {
+			manage-bde -on c: -s -rp
+		}
 
 The script uses the [HP BIOS Configuration Utility (BCU)](http://ftp.hp.com/pub/caps-softpaq/cmit/HP_BCU.html) available for HP devices as part of the HP System Software Manager. The configuration file used in my script is below. This is confirmed to work on the HP EliteBook 2730p, HP EliteBook 2740p, and the HP EliteBook 2760p. In the BiosConfigUtility64 command, you will need to specify your BIOS admin password with the `/cspwd:` parameter. One handy feature is that you can supply multiple passwords with multiple `/cspwd` parameters. A (kind of) hidden setting in the HP BIOS is the `Embedded Security Activation Policy` feature. This isn't exposed in the BIOS UI, but when you use the BCU to get the BIOS's configuration it will be there. This setting determines whether or not your users will be given the chance to accept or reject activation of the TPM when the machine is rebooted. Naturally, I did not want to give my users the chance to reject enabling their TPM, so the setting is changed to `No prompts`.
 
-{% codeblock lang:text Enable-TPM.cfg  %}
-English
-TPM Reset to Factory Defaults
-	Yes
-	*No
-Reset of TPM from OS
-	*Disable
-	Enable
-OS Management of TPM
-	Disable
-	*Enable
-Activate Embedded Security On Next Boot
-	Disable
-	*Enable
-Embedded Security Device Availability
-	*Available
-	Hidden
-Embedded Security Activation Policy
-	F1 to Boot
-	Allow user to reject
-	*No prompts
-{% endcodeblock %}
+	English
+	TPM Reset to Factory Defaults
+		Yes
+		*No
+	Reset of TPM from OS
+		*Disable
+		Enable
+	OS Management of TPM
+		Disable
+		*Enable
+	Activate Embedded Security On Next Boot
+		Disable
+		*Enable
+	Embedded Security Device Availability
+		*Available
+		Hidden
+	Embedded Security Activation Policy
+		F1 to Boot
+		Allow user to reject
+		*No prompts
 
 Once you have the script ready, you need to put it and the BCU (if needed) somewhere accessible via your domain computers. I chose a public install share, \\example.local\Install\Bitlocker\.
 
-Schedule a Task to Enable Bitlocker via PowerShell
-==================================================
+# Schedule a Task to Enable Bitlocker via PowerShell
 
 Once the script is ready, it is time to use Group Policy to create a Scheduled Task on our computers to run the script. 
 

@@ -1,10 +1,6 @@
----
-layout: post
-title: "Schedule a Task to Update ShadowProtect After Hours"
+title: Schedule a Task to Update ShadowProtect After Hours
 date: 2014-10-03 13:47:10 -0400
-comments: true
-categories: ShadowProtect Deployment Windows
----
+tags: ShadowProtect, Deployment, Windows
 
 Recently I needed to deploy some updates to some computers running [StorageCraft ShadowProtect](http://www.storagecraft.com/products/overviews/storagecraft-shadowprotect). In doing this, I was faced with three problems:
 
@@ -21,12 +17,11 @@ Silently Installing ShadowProtect
 
 [StorageCraft's documentation](http://www.storagecraft.com/support/kb/article/200) on silently installing ShadowProtect is worth a read. The most important parameter is *OMIT*. The *OMIT* parameter specifies which products you wish to install. If you only want the backup capability on this machine, you can omit everything except *Agent* (as I do). Delete OMIT parameters for features you want. Using this information, I've now got a batch file that will install ShadowProtect on a server and reboot it:
 
-{% codeblock lang:bat Update-ShadowProtect.bat %}
-pushd %~dp0
+	:::bat
+	pushd %~dp0
 
-start /wait ShadowProtectSetup_5.2.0.exe install IACCEPT=STORAGECRAFT.EULA LANG=en OMIT=Console OMIT=Mount OMIT=VirtualBoot
-shutdown /r /t 30
-{% endcodeblock %}
+	start /wait ShadowProtectSetup_5.2.0.exe install IACCEPT=STORAGECRAFT.EULA LANG=en OMIT=Console OMIT=Mount OMIT=VirtualBoot
+	shutdown /r /t 30
 
 This script will run *ShadowProtectSetup_5.2.0.exe* from the script's directory in silent mode and install *only* the agent. To deploy using this script, copy it to a share accessible by your server(s), and then you can proceed with scheduling a task to deploy it. In my example, I've got the deployment script and installer at "\\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat".
 
@@ -35,9 +30,8 @@ Using Schtasks to Schedule a Task to Deploy ShadowProtect
 
 The [schtasks](http://msdn.microsoft.com/en-us/library/windows/desktop/bb736357%28v=vs.85%29.aspx) tool is the magic here. It allows me to schedule processes that will run on a remote computer at whatever time I specify. The template command we will use is the following:
 
-{% codeblock lang:bat %}
-schtasks /create /S server /tn "Install ShadowProtect" /tr "\"\\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat" /sc once /st 20:00 /ru "System"
-{% endcodeblock %}
+	:::bat
+	schtasks /create /S server /tn "Install ShadowProtect" /tr "\"\\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat" /sc once /st 20:00 /ru "System"
 
 This tells `schtasks` to create on **server** a task called **Install ShadowProtect** that runs the command **\\example.com\Install\StorageCraft ShadowProtect 5.2.0\install.bat** **once** at **20:00** (8pm) local time as the **System** account. For each of our servers, replace *server* with the server name and the task will be scheduled. Note that this will only work if:
 

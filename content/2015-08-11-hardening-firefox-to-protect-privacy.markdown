@@ -1,10 +1,6 @@
----
-layout: post
-title: "Hardening Firefox to Protect Privacy"
+title: Hardening Firefox to Protect Privacy
 date: 2015-08-11 17:40:39 -0400
-comments: true
-categories: firefox privacy security
----
+tags: firefox, privacy, security
 
 Your web browser is your gateway to the Internet. Unfortunately, sometimes the gate works both ways. In this guide I will cover some tricks to help protect yourself online. I have been using Firefox configured like this for quite a while and wanted to share this with you. I'll admit this configuration could probably go further (eg. disabling JavaScript, employing NoScript, disabling remote fonts, etc.) but I feel like this setup provides a good balance between protecting privacy/security and keeping the browser usable.
 
@@ -25,7 +21,7 @@ Third-party cookie settings are available in the Options window's Privacy panel:
 
 You can [read more about disabling third-party cookies at the Firefox Help website](https://support.mozilla.org/en-US/kb/disable-third-party-cookies).
 
-<img src="{{ root_url }}/uploads/Disable%20Third-party%20Cookies.gif" name="Disable Third-Party Cookies">
+![Disable Third-Party Cookies]({filename}/images/Disable%20Third-party%20Cookies.gif)
 
 # Enable Tracking Protection
 
@@ -38,7 +34,7 @@ How to turn on Tracking Protection:
 3. Search for **privacy.trackingprotection.enabled**.
 4. Double-click **privacy.trackingprotection.enabled** to toggle its value to *true*.
 
-<img src="{{ root_url }}/uploads/Enable%20Tracking%20Protection.gif" name="Enable Tracking Protection">
+![Enable Tracking Protection]({filename}/images/Enable%20Tracking%20Protection.gif)
 
 ## Troubleshooting Tracking Protection
 
@@ -58,7 +54,7 @@ By default uBlock uses a fairly minimal filtering list which is focused on block
 4. Enable (check) the additional filter lists, provided below.
 5. Once you are done, click **Apply changes**.
 
-<img src="{{ root_url }}/uploads/uBlock%20Origin%20Settings.gif" name="uBlock Origin Settings">
+![uBlock Origin Settings]({filename}/images/uBlock%20Origin%20Settings.gif)
 
 ### Ads
 
@@ -104,4 +100,4 @@ In going through plug-ins, I usually set all of them to *Never Activate*, except
 
 Whenever you visit a page which requires a plugin, Firefox will display a notification along the top prompting you to allow the plug-in to run. If you trust the site, and want to run plugins all the time, click *Allow...*. From there you can choose to allow the plug-in this one time or allow it always. In most cases I'd recommend allowing the plug-in only once, however for some sites I'll tell it to *Allow and remember* (such as YouTube).
 
-<img src="{{ root_url }}/uploads/Disable%20Plugins.gif" name="Disable Plugins">
+![Disable Plugins]({filename}/images/Disable%20Plugins.gif)

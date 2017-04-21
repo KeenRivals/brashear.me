@@ -1,10 +1,6 @@
----
-layout: post
-title: "Results of the 2014 /r/Linux Distribution Survey"
+title: Results of the 2014 /r/Linux Distribution Survey
 date: 2014-05-18 18:31:48 -0400
-comments: true
-categories: linux survey results data
----
+tags: linux, survey, results, data
 
 ## Introduction
 
@@ -39,8 +35,7 @@ The results are broken up by question. Many of the graphs consist of a "Top X" o
 </figure>
 
 | Do you use Linux on any non-server computers?      | Responses | Responses (%) 
-|-------------|-----------|---------------------
-| Yes         | 9896      | 96%                 
+|-------------|-----------|------------------| Yes         | 9896      | 96%                 
 | No          | 383       | 4%                  
 | Grand Total | 10279     | 100%                
 
@@ -55,8 +50,7 @@ The proportion of people using desktops to those not using desktops is more or l
 </figure>
 
 | Do you run Linux on any of your server computers? | Responses | Responses (%) 
-|---------------------------------------------------|-----------|---------------------
-| Yes                                               | 5940      | 58%                 
+|---------------------------------------------------|-----------|------------------| Yes                                               | 5940      | 58%                 
 | No                                                | 4339      | 42%                 
 
 This is one of the questions we will use to compare the results among groups. The goal is to see if server users have different preferences than people who don't use servers. I'm not saying one is better than the other, it's just that I find the difference interesting! I'd hypothesize that server users are more likely to use "hard" distros like Gentoo, Arch Linux, or others like them, whereas people without servers will tend towards distros that aim for less manual configuration and/or to be easier to use (Mint, Ubuntu, etc.).
@@ -68,8 +62,7 @@ This is one of the questions we will use to compare the results among groups. Th
 </figure>
 
 | Option      | On Desktops | On Desktops (%) | On Servers | On Servers (%) 
-|-------------|-------------|-----------------|------------|----------------
-| Fun         | 7749        | 79.23%          | 3820       | 66.96%         
+|-------------|-------------|-----------------|------------|-------------| Fun         | 7749        | 79.23%          | 3820       | 66.96%         
 | Profit      | 2031        | 20.77%          | 1568       | 27.48%         
 | (blank)     | 0           | 0.00%           | 317        | 5.56%          
 | Grand Total | 9780        | 100.00%         | 5705       | 100.00%        
@@ -85,8 +78,7 @@ This question was a new addition for our 2014 survey. I caught a little heat due
 </figure>
 
 | Distribution  | Server Users | Desktop Users 
-|---------------|---------------|--------------
-| Arch Linux    | 64%           | 36%          
+|---------------|---------------|-----------| Arch Linux    | 64%           | 36%          
 | Ubuntu        | 54%           | 46%          
 | Debian        | 67%           | 33%          
 | Linux Mint    | 45%           | 55%          
@@ -145,8 +137,7 @@ In addition to comparing server usage, we can also look at how use of Desktop Li
 </figure>
 
 | Distribution | Fun | Profit | (blank) 
-|------------------------------------------------|-----|--------|---------
-| Arch Linux                                     | 84% | 15%    | 1%      
+|------------------------------------------------|-----|--------|------| Arch Linux                                     | 84% | 15%    | 1%      
 | Fedora                                         | 71% | 28%    | 1%      
 | Crunchbang                                     | 84% | 15%    | 1%      
 | Debian                                         | 76% | 23%    | 1%      
@@ -190,8 +181,7 @@ To my surprise, there didn't seem to be all that much variation amongst desktop 
 </figure>
 
 | Distribution | Responses 
-|----------------------|-----------
-| Debian               | 2084      
+|----------------------|--------| Debian               | 2084      
 | Ubuntu               | 2003      
 | Arch Linux           | 1199      
 | Linux Mint           | 1090      
@@ -212,8 +202,7 @@ What's particularly notable here is that /r/Linux isn't dominated by just a few 
 </figure>
 
 | Platform         | Responses 
-|------------------|-----------
-| Laptop/Tablet    | 4626      
+|------------------|--------| Laptop/Tablet    | 4626      
 | Desktop Computer | 4525      
 | Virtual Machine  | 318       
 | Workstation      | 249       
@@ -233,8 +222,7 @@ It comes as no surprise that most people are running their primary desktop distr
 </figure>
 
 | Platform         | Responses 
-|------------------|-----------
-| Laptop/Tablet    | 3224      
+|------------------|--------| Laptop/Tablet    | 3224      
 | Desktop Computer | 2696      
 | Virtual Machine  | 1936      
 | Raspberry Pi     | 1321      
@@ -252,8 +240,7 @@ In asking what other platforms people are running desktop Linux on, we get a wid
 </figure>
 
 | Server Distribution          | Desktop Users | Server Users | Grand Total 
-|------------------------------|---------------|--------------|-------------
-| Debian                       | 1775          | 82           | 1857        
+|------------------------------|---------------|--------------|----------| Debian                       | 1775          | 82           | 1857        
 | Ubuntu                       | 1515          | 80           | 1595        
 | CentOS                       | 807           | 60           | 867         
 | Arch Linux                   | 549           | 12           | 561         
@@ -282,8 +269,7 @@ A more interesting way to look at what servers people are using is to compare it
 </figure>
 
 | Server Distro            | Fun | Profit | (blank) 
-|--------------------------|-----|--------|---------
-| Debian                   | 60% | 36%    | 4%      
+|--------------------------|-----|--------|------| Debian                   | 60% | 36%    | 4%      
 | Ubuntu                   | 48% | 47%    | 4%      
 | CentOS                   | 31% | 66%    | 3%      
 | Arch Linux               | 79% | 17%    | 4%      
@@ -329,8 +315,7 @@ This comparison overall seems to show that use of server distributions tends to 
 </figure>
 
 | Server Distribution          | Responses 
-|------------------------------|-----------
-| Debian                       | 1016      
+|------------------------------|--------| Debian                       | 1016      
 | Ubuntu                       | 953       
 | CentOS                       | 909       
 | Arch Linux                   | 357       
@@ -351,8 +336,7 @@ This is another chart whose stats are ripped directly from the Google Drive summ
 </figure>
 
 | Platform                           | Responses 
-|------------------------------------|-----------
-| Rack Server                        | 1583      
+|------------------------------------|--------| Rack Server                        | 1583      
 | Desktop Computer                   | 1266      
 | Cloud Services (AWS, Linode, etc.) | 1105      
 | Virtual Machine                    | 806       
@@ -373,8 +357,7 @@ It should be no surprise that the top hardware platform for servers is rack hard
 </figure>
 
 | Favorite GUIs                  | Responses 
-|--------------------------------|-----------
-| GNOME 3.x                      | 1565      
+|--------------------------------|--------| GNOME 3.x                      | 1565      
 | KDE 4.x                        | 1339      
 | XFCE                           | 1201      
 | Unity                          | 1166      
@@ -395,8 +378,7 @@ This year, GNOME 3 has unseated KDE 4.x for the favorite GUI of /r/Linux! My gue
 </figure>
 
 | Most Hated GUIs           | Responses 
-|--------------------------------|-----------
-| Unity                          | 3355      
+|--------------------------------|--------| Unity                          | 3355      
 | GNOME 3.x                      | 1684      
 | KDE 4.x                        | 898       
 | KDE 3.x                        | 289       

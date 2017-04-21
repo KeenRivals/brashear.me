@@ -1,10 +1,7 @@
----
-layout: post
-title: "Deploy Application Updates with Ninite with a Cache on your LAN"
+title: Deploy Application Updates with Ninite with a Cache on your LAN
 date: 2015-01-23 13:10:47 -0500
-comments: false
-categories: sysadmin deployment ninite powershell windows
----
+categories: sysadmin, deployment, ninite, powershell, windows
+
 Recently we purchased [Ninite Pro](https://ninite.com/pro) for our organization and have implemented silent application updating via a scheduled task with PowerShell. This process uses a cache on our LAN to store updates and speed the whole process along. After some thinking I decided I wanted to get this working off-site so that when students take their laptops home over the summer, they can continue to receive updates.
 
 <!-- more -->
@@ -34,37 +31,35 @@ The script below is what enables the magic. In summary, it tests if it can conne
 
 In this script, Ninite is run in update-only mode for specifically listed applications. The installer will prevent the creation of shortcuts and auto-update functions by the installed applications.
 
-{% codeblock Ninite-Update.ps1 - Ninite-Update.ps1 %}
-# Ninite Pro App Selection List
-# https://ninite.com/applist/pro.html
-Set-Variable APPS -option constant -value '"7-Zip" QuickTime Acrobat Air Audacity Firefox Flash "Flash (IE)" "Google Drive" "Google Earth" GIMP Inkscape Java "KeePass 2" "Notepad++" Reader Shockwave SumatraPDF VLC'
- 
- 
- 
-function updateOnsite ($apps) {
-	$dir = "\\example.com\Ninite"
-	Push-Location $dir
-	
-	& .\NinitePro.exe /silent $dir\Reports\$env:computername.txt /updateonly /select $apps /cachepath $dir\Cache /disableautoupdate /disableshortcuts
-} 
- 
-function updateOffsite($apps) {
-	$dir = "C:\Windows\temp\Ninite\"
-	Push-Location $dir
-	
-	& .\NinitePro.exe /silent $dir\$env:computername.txt /updateonly /select $apps /disableautoupdate /disableshortcuts
-}
- 
-function main () {
-	if (Test-Connection file.example.com -quiet) {
-		updateOnsite $APPS
-	} elseif (Test-Path "C:\Windows\Temp\Ninite\NinitePro.exe" ){
-		updateOffsite $APPS
+	:::ps1
+	# Ninite Pro App Selection List
+	# https://ninite.com/applist/pro.html
+	Set-Variable APPS -option constant -value '"7-Zip" QuickTime Acrobat Air Audacity Firefox Flash "Flash (IE)" "Google Drive" "Google Earth" GIMP Inkscape Java "KeePass 2" "Notepad++" Reader Shockwave SumatraPDF VLC'
+	 
+	 
+	function updateOnsite ($apps) {
+		$dir = "\\example.com\Ninite"
+		Push-Location $dir
+		
+		& .\NinitePro.exe /silent $dir\Reports\$env:computername.txt /updateonly /select $apps /cachepath $dir\Cache /disableautoupdate /disableshortcuts
+	} 
+	 
+	function updateOffsite($apps) {
+		$dir = "C:\Windows\temp\Ninite\"
+		Push-Location $dir
+		
+		& .\NinitePro.exe /silent $dir\$env:computername.txt /updateonly /select $apps /disableautoupdate /disableshortcuts
 	}
-}
- 
-main
-{% endcodeblock %}
+	 
+	function main () {
+		if (Test-Connection file.example.com -quiet) {
+			updateOnsite $APPS
+		} elseif (Test-Path "C:\Windows\Temp\Ninite\NinitePro.exe" ){
+			updateOffsite $APPS
+		}
+	}
+	 
+	main
 
 You need to customize this script to fit your environment. 
 

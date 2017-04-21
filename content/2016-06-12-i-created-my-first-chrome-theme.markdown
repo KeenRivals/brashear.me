@@ -1,10 +1,6 @@
----
-layout: post
-title: "I created my first Chrome theme!"
+title: I created my first Chrome theme!
 date: 2016-06-12 09:44:33 -0400
-comments: true
-categories: chrome
----
+tags: chrome
 
 I recently switch to Chrome from Firefox. I'm not sure how long I'll stay but I really missed Firefox's awesome dark [Developer Edition Theme](https://wiki.mozilla.org/DevTools/Developer_Edition_Theme). The Chrome web store was lacking an equivalent, so I made one! You can find it on the Chrome Web Store under the name, [Developer Edition Dark](https://chrome.google.com/webstore/detail/developer-edition-dark/lglfmldlfmbbehalkgiglehhjblbfcjo). It's [open source on GitHub](https://github.com/KeenRivals/chrome-developer-edition-dark) too!
 

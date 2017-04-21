@@ -1,10 +1,6 @@
----
-layout: post
-title: "How to use Cincinnati Bell Fioptics with your own router"
+title: How to use Cincinnati Bell Fioptics with your own router
 date: 2015-09-23 12:37:33 -0400
-comments: true
-categories: networking
----
+tags: networking
 
 I recently purchased gigabit Fioptics Internet service from Cincinnati Bell. At first I was hesitant to go through with it. I did not want to use a crappy ISP router and forgo my wonderful [ASUS RT-N66U](http://amzn.to/1jadh79) or be stuck running some sort of NAT-behind-NAT nightmare network. The day after installation, I took it upon myself to get my ASUS RT-N66U gateway working and remove Cincinnati Bell’s router. I was able to do this while keeping my Fioptics TV and on-demand features working. It was easy, but there is not much guidance out there on the Internet so I figured I would document my setup online. 
 
@@ -25,7 +21,7 @@ I recently purchased gigabit Fioptics Internet service from Cincinnati Bell. At 
 This section is optional, and may be paranoia on my part. I want my router to present the same MAC address to Cincinnati Bell as their router. I'm sure that if they really looked they can determine I'm not using their router. I simply don't want to call their support and have the first thing they say be that I'm not using their router. The MAC is printed somewhere on the Cincinnati Bell gateway. Make a note of it. Make sure you get the ethernet MAC address the gateway uses and *not* the WLAN MAC address. 
 
 1. Once you know the gateway's MAC address, it's time to go offline. Disconnect the CB gateway and your router from the Internet. My thinking is I don't want Cincinnati Bell to ever see my router's true MAC if I can help it.
-1. Log in to your router and tell it to use the MAC address you got from the gateway. On the ASUS RT-N66U, this is under *WAN* > *Internet Connection* tab > *Special Requirement from ISP*. You may <a href="{{ root_url }}/uploads/RT-N66U-MAC-Address-Setting.png" title="ASUS RT-N66U MAC Address Settings Page">view this screenshot for reference</a>.
+1. Log in to your router and tell it to use the MAC address you got from the gateway. On the ASUS RT-N66U, this is under *WAN* > *Internet Connection* tab > *Special Requirement from ISP*. You may [view this screenshot for reference]({filename}/images/RT-N66U-MAC-Address-Setting.png).
 1. Apply those settings. Once you've done that and given the router time to reboot you can connect it to the Internet again. This is the easy part. You should find that your Internet works just fine. I was a little surprised given how Cincinnati Bell swears up and down that you absolutely *must* use their router.
 
 ## Set up IGMP snooping on your router
@@ -36,7 +32,7 @@ In order for your Fioptics TV to work, you need to enable IGMP snooping and tell
 	1. Set *Enable multicast routing* to **Enable**.
 	1. Set *Enable efficient multicast forwarding* to **Enable**.
 1. On my ASUS router, I set the IPTV STB port to be the port my set top box is connected to (LAN1). On Fioptics, this may be the wireless bridge that connects to your STB (more on that piece of garbage later).
-1. Apply the settings and your TV should be working. You may <a href="{{ root_url }}/uploads/RT-N66U-IPTV-Settings.png" title="ASUS RT-N66U IPTV Settings for Fioptics">view this screenshot of my settings for reference</a>.
+1. Apply the settings and your TV should be working. You may [view this screenshot of my settings for reference]({filename}/images/RT-N66U-IPTV-Settings.png "ASUS RT-N66U IPTV Settings for Fioptics").
 
 ## Testing
 

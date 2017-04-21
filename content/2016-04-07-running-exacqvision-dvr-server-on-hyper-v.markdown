@@ -1,10 +1,6 @@
----
-layout: post
-title: "Running ExacqVision DVR Server on Hyper-V"
+title: Running ExacqVision DVR Server on Hyper-V
 date: 2016-04-07 10:16:23 -0400
-comments: true
-categories: Linux exacqVision Hyper-V Windows
----
+tags: Linux, exacqVision, Hyper-V, Windows
 
 [ExacqVision](https://exacq.com/) is a DVR suite for security cameras. It works all right, I can't really complain on that front. However, they license their software based on the MAC address of the server. This is pretty stupid on its face because it means a failure of the NIC means you need to relicense your server (which costs $$$ for a transfer) and in virtual environments, MAC addresses change easily. It gets really stupid when the software is incapable of reading the NIC's MAC just because it is a Hyper-V NIC and I can't license my server because of it. Thankfully, it's possible to work around the issue.
 
