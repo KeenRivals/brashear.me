@@ -37,7 +37,7 @@
 {% if LINKS %}
 <aside>
 	<p>
-		{{ LINKS_WIDGET_NAME | default('Links') }}</h1>
+		{{ LINKS_WIDGET_NAME | default('Links') }}:
 		{% for name, link in LINKS %}
 			<a href="{{ link }}">{{ name }}</a> &bull;
 		{% endfor %}
