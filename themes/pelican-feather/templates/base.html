@@ -6,6 +6,7 @@
 <title>{% block title %}{{ SITENAME }}{%endblock%}</title>
 <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/normalize.css" />
 <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/main.css" />
+<link rel="stylesheet" media="print" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/print.css" />
 <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/pygment.css" />
 {% if FEED_ALL_ATOM %}
 <link href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Atom Feed" />
