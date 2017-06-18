@@ -1,9 +1,7 @@
 title: Enable Bitlocker Disk Encryption Via Scheduled Task
 date: 2014-10-07 10:26:47 -0400
 tags: windows, bitlocker, deployment
-
-Enable Bitlocker Disk Encryption Via Scheduled Task
-
+summary: I've been working on deploying Bitlocker across our Active Directory domain via a scheduled task. The advantage of using a scheduled task to enable Bitlocker (versus a startup or shutdown script) is that I can configure it to run when the computer is idle. I liked this solution over a startup script because my users on laptops very *very* rarely reboot their computers, and so startup scripts very *very* rarely get a chance to run.
 
 I've been working on deploying Bitlocker across our Active Directory domain via a scheduled task. My goals here were as such:
 
@@ -12,8 +10,6 @@ I've been working on deploying Bitlocker across our Active Directory domain via 
  * On some of our devices (HP EliteBooks) the TPM was not enabled by default, so I needed to enable it.
 
 The advantage of using a scheduled task to enable Bitlocker (versus a startup or shutdown script) is that I can configure it to run when the computer is idle. I liked this solution over a startup script because my users on laptops very *very* rarely reboot their computers, and so startup scripts very *very* rarely get a chance to run.
-
-<!-- more -->
 
 # Prepare the Script
 

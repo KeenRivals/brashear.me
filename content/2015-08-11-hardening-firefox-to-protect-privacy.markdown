@@ -1,10 +1,9 @@
 title: Hardening Firefox to Protect Privacy
 date: 2015-08-11 17:40:39 -0400
 tags: firefox, privacy, security
+summary: Your web browser is your gateway to the Internet. Unfortunately, sometimes the gate works both ways. In this guide I will cover some tricks to help protect yourself online. I have been using Firefox configured like this for quite a while and wanted to share this with you. I'll admit this configuration could probably go further (eg. disabling JavaScript, employing NoScript, disabling remote fonts, etc.) but I feel like this setup provides a good balance between protecting privacy/security and keeping the browser usable.
 
 Your web browser is your gateway to the Internet. Unfortunately, sometimes the gate works both ways. In this guide I will cover some tricks to help protect yourself online. I have been using Firefox configured like this for quite a while and wanted to share this with you. I'll admit this configuration could probably go further (eg. disabling JavaScript, employing NoScript, disabling remote fonts, etc.) but I feel like this setup provides a good balance between protecting privacy/security and keeping the browser usable.
-
-<!-- more -->
 
 # Disable Third-Party Cookies
 

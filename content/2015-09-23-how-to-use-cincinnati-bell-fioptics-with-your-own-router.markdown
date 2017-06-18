@@ -1,10 +1,9 @@
 title: How to use Cincinnati Bell Fioptics with your own router
 date: 2015-09-23 12:37:33 -0400
 tags: networking
+summary: I recently purchased gigabit Fioptics Internet service from Cincinnati Bell. At first I was hesitant to go through with it. I did not want to use a crappy ISP router and forgo my wonderful [ASUS RT-N66U](http://amzn.to/1jadh79) or be stuck running some sort of NAT-behind-NAT nightmare network. The day after installation, I took it upon myself to get my ASUS RT-N66U gateway working and remove Cincinnati Bell’s router. I was able to do this while keeping my Fioptics TV and on-demand features working. It was easy, but there is not much guidance out there on the Internet so I figured I would document my setup online. 
 
 I recently purchased gigabit Fioptics Internet service from Cincinnati Bell. At first I was hesitant to go through with it. I did not want to use a crappy ISP router and forgo my wonderful [ASUS RT-N66U](http://amzn.to/1jadh79) or be stuck running some sort of NAT-behind-NAT nightmare network. The day after installation, I took it upon myself to get my ASUS RT-N66U gateway working and remove Cincinnati Bell’s router. I was able to do this while keeping my Fioptics TV and on-demand features working. It was easy, but there is not much guidance out there on the Internet so I figured I would document my setup online. 
-
-<!-- more -->
 
 # Requirements
 

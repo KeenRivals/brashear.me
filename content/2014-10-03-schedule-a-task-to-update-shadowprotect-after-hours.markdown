@@ -1,6 +1,7 @@
 title: Schedule a Task to Update ShadowProtect After Hours
 date: 2014-10-03 13:47:10 -0400
 tags: ShadowProtect, Deployment, Windows
+summary: Recently I needed to deploy some updates to some computers running [StorageCraft ShadowProtect](http://www.storagecraft.com/products/overviews/storagecraft-shadowprotect). The solution here is a little automation with the help of a little batch and `schtasks` on my workstation.
 
 Recently I needed to deploy some updates to some computers running [StorageCraft ShadowProtect](http://www.storagecraft.com/products/overviews/storagecraft-shadowprotect). In doing this, I was faced with three problems:
 

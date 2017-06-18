@@ -1,10 +1,9 @@
 title: Getting Adobe Creative Cloud Enterprise to Install from a Network Share
 date: 2014-04-02 13:19:04 -0400
 tags: deployment, msi, sysadmin, adobe
+summary: I've been fighting geting Adobe Creative Cloud to install properly from a LiteTouch deployment share. In my troubleshooting, I was always able to install the exceptions just fine, but the MSI package created by Adobe's Creative Cloud Packager would not run successfully from a network share.
 
 I've been fighting geting Adobe Creative Cloud to install properly from a LiteTouch deployment share. In my troubleshooting, I was always able to install the exceptions just fine, but the MSI package created by Adobe's Creative Cloud Packager would not run successfully from a network share. When I tried to log what was happening, I kept getting a 1603 error in the InstallFinalize step along the lines of the following:
-<!-- more -->
-
 
 	Action start 13:33:43: InstallFinalize.
 	CustomAction CADeploy returned actual error code 1603 (note this may not be 100% accurate if translation happened inside sandbox)

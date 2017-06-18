@@ -1,0 +1,7 @@
+<footer class="post-info">
+	<p>Published <abbr title="{{ article.date.isoformat() }}">{{ article.locale_date }}</abbr>.
+        {% if article.modified %}
+		Updated <abbr title="{{ article.modified.isoformat() }}">{{ article.locale_modified }}</abbr>.
+        {% endif %}
+	</p>
+</footer><!-- /.post-info -->

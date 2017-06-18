@@ -1,10 +1,9 @@
 title: Running ExacqVision DVR Server on Hyper-V
 date: 2016-04-07 10:16:23 -0400
 tags: Linux, exacqVision, Hyper-V, Windows
+summary: [ExacqVision](https://exacq.com/) is a DVR suite for security cameras. It works all right, I can't really complain on that front. However, they license their software based on the MAC address of the server. This is pretty stupid on its face because it means a failure of the NIC means you need to relicense your server (which costs $$$ for a transfer) and in virtual environments, MAC addresses change easily. It gets really stupid when the software is incapable of reading the NIC's MAC just because it is a Hyper-V NIC and I can't license my server because of it. Thankfully, it's possible to work around the issue.
 
 [ExacqVision](https://exacq.com/) is a DVR suite for security cameras. It works all right, I can't really complain on that front. However, they license their software based on the MAC address of the server. This is pretty stupid on its face because it means a failure of the NIC means you need to relicense your server (which costs $$$ for a transfer) and in virtual environments, MAC addresses change easily. It gets really stupid when the software is incapable of reading the NIC's MAC just because it is a Hyper-V NIC and I can't license my server because of it. Thankfully, it's possible to work around the issue.
-
-<!-- more -->
 
 In my setup, I have Server 2012 R2 running Hyper-V in a cluster with two nodes. ExacqVision supports virtual servers via an ESXi virtual appliance, and they want you [to use a specific NIC in ESXi](https://exacq.com/kb/#loadAnswer~872dd883-65ad-6832-84e8-56040ecf6bdc~2390b846-d254-0d15-3020-49b7deab2088) in order for their software to work. In my setup, I can't use that NIC because it isn't in Hyper-V! I set up the original server as a Generation 2 (UEFI) VM, and there was no way for Exacq to pick up the NIC's MAC. Exacq support was supremely unhelpful, insisting that there was no way it would work and Hyper-V was unsupported.
 

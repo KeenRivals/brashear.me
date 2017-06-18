@@ -1,10 +1,9 @@
 title: Deploy Application Updates with Ninite with a Cache on your LAN
 date: 2015-01-23 13:10:47 -0500
-categories: sysadmin, deployment, ninite, powershell, windows
+tags: sysadmin, deployment, ninite, powershell, windows
+summary:  Recently we purchased [Ninite Pro](https://ninite.com/pro) for our organization and have implemented silent application updating via a scheduled task with PowerShell. This process uses a cache on our LAN to store updates and speed the whole process along. After some thinking I decided I wanted to get this working off-site so that when students take their laptops home over the summer, they can continue to receive updates.
 
 Recently we purchased [Ninite Pro](https://ninite.com/pro) for our organization and have implemented silent application updating via a scheduled task with PowerShell. This process uses a cache on our LAN to store updates and speed the whole process along. After some thinking I decided I wanted to get this working off-site so that when students take their laptops home over the summer, they can continue to receive updates.
-
-<!-- more -->
 
 # Overview
 

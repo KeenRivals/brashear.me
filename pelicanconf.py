@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 
 AUTHOR = 'root'
 SITENAME = 'Fighting the System'
-SITEURL = ''
+SITESUBTITLE = 'A blog of hacks and workarounds'
+SITEURL = 'https://brashear.me'
 
 PATH = 'content'
 
@@ -15,7 +16,7 @@ DELETE_OUTPUT_DIRECTORY = True
 
 STATIC_PATHS = ['images','files']
 
-THEME = 'themes/feather'
+THEME = 'themes/pelican-feather'
 
 # Plugin settings
 PLUGIN_PATHS = ['plugins']
@@ -25,11 +26,16 @@ PLUGINS = ['sitemap']
 SITEMAP = { 'format': 'xml' }
 
 TIMEZONE = 'America/New_York'
+DEFAULT_DATE_Format = '%b %D, %Y'
+DATE_FORMATS = {
+	'en': '%b %d, %Y',
+}
+
 
 DEFAULT_LANG = 'en'
 
 # Feed generation is usually not desired when developing
-FEED_ALL_ATOM = None
+FEED_ALL_ATOM = 'atom.xml'
 CATEGORY_FEED_ATOM = None
 TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
@@ -39,9 +45,12 @@ AUTHOR_FEED_RSS = None
 LINKS = ()
 
 # Social widget
-SOCIAL = ()
+SOCIAL = (
+	('Email','mailto:web@brashear.me'),
+	('GitHub','https://github.com/KeenRivals')
+)
 
-DEFAULT_PAGINATION = False
+DEFAULT_PAGINATION = 5
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
