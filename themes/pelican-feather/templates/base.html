@@ -33,13 +33,12 @@
 </header>
 {% block content %}
 {% endblock %}
-<hr>
 {% if LINKS %}
 <aside>
 	<p>
 		{{ LINKS_WIDGET_NAME | default('Links') }}:
 		{% for name, link in LINKS %}
-			<a href="{{ link }}">{{ name }}</a> &bull;
+			<a href="{{ link }}">{{ name }}</a>, 
 		{% endfor %}
 	</div><!-- /.blogroll -->
 </aside><!-- /#extras -->
@@ -49,14 +48,18 @@
 	<p>
 		{{ SOCIAL_WIDGET_NAME | default('Social') }}: 
 		{% if FEED_ALL_ATOM %}
-		<a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" type="application/atom+xml" rel="alternate">Atom feed</a> &bull; 
+		<a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" type="application/atom+xml" rel="alternate">Atom feed</a>, 
 		{% endif %}
 		{% if FEED_ALL_RSS %}
-		<a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_RSS }}" type="application/rss+xml" rel="alternate">RSS feed</a> &bull; 
+		<a href="{{ FEED_DOMAIN }}/{{ FEED_ALL_RSS }}" type="application/rss+xml" rel="alternate">RSS feed</a>, 
 		{% endif %}
 
 	{% for name, link in SOCIAL %}
-		<a href="{{ link }}">{{ name }}</a> &bull;
+		{% if loop.last %}
+			<a href="{{ link }}">{{ name }}</a>
+			{% else %}
+			<a href="{{ link }}">{{ name }}</a>, 
+		{% endif %}
 	{% endfor %}
 	</p>
 </aside><!-- /#extras -->
