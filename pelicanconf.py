@@ -7,6 +7,10 @@ SITENAME = 'Fighting the System'
 SITESUBTITLE = 'A blog of hacks and workarounds'
 SITEURL = 'https://brashear.me'
 
+# Use Octopress URL structure.
+ARTICLE_URL = 'blog/{date:%Y}/{date:%m}/{date:%d}/{slug}/'
+ARTICLE_SAVE_AS = 'blog/{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
+
 PATH = 'content'
 
 DEFAULT_CATEGORY = 'Blog'
