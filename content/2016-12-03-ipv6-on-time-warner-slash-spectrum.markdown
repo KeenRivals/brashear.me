@@ -3,6 +3,8 @@ date: 2016-12-03 02:51:27 -0500
 modified: 2017-04-30T17:14-04:00
 tags: networking, ipv6
 summary:  I recently moved and had to give up my beloved Fioptics gigabit Internet service. They were great, but the only thing they are behind on is IPv6 deployment. In 2015 when I switched to Fioptics, I asked them about their IPv6 plan and got a vague answer along the lines of "we're working on it". Time Warner had working IPv6 for a long time. Now that I'm back on Time Warner, it's time to get some sweet sweet IPv6 again.
+slug: ipv6-on-time-warner-slash-spectrum
+
 
 I recently moved and had to give up my beloved Fioptics gigabit Internet service. They were great, but the only thing they are behind on is IPv6 deployment. In 2015 when I switched to Fioptics, I asked them about their IPv6 plan and got a vague answer along the lines of "we're working on it". Time Warner had working IPv6 for a long time. Now that I'm back on Time Warner, it's time to get some sweet sweet IPv6 again.
 

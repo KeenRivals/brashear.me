@@ -2,6 +2,7 @@ title: Microsoft Visual C++ 2012 Redist Broken After Windows 10 1607 Upgrade
 date: 2016-09-20 18:33:44 -0400
 tags: windows, sysadmin, deployment, wsus
 summary: I've been deploying the Windows 10 build 1607 feature upgrade (also known as the Anniversary Update) via WSUS to a test lab at work. The machines are upgrading from 1511. Today I was informed that Autodesk 3ds Max & AutoCad would not launch on those machines. 3dsmax.exe gave an error: *"The procedure entry point __crtCreateSymbolicLinkW could not be located in the dynamic link library C:\WINDOWS\SYSTEM32\MSVCP110.dll."* 
+slug: microsoft-visual-c-plus-plus-2012-redist-broken-after-windows-10-1607-upgrade
 
 I've been deploying the Windows 10 build 1607 feature upgrade (also known as the Anniversary Update) via WSUS to a test lab at work. The machines are upgrading from 1511. Today I was informed that Autodesk 3ds Max & AutoCad would not launch on those machines. 3dsmax.exe gave an error: *"The procedure entry point __crtCreateSymbolicLinkW could not be located in the dynamic link library C:\WINDOWS\SYSTEM32\MSVCP110.dll."* 
 

@@ -2,6 +2,7 @@ title: Results of the 2014 /r/Linux Distribution Survey
 date: 2014-05-18 18:31:48 -0400
 tags: linux, survey, results, data
 summary: About two years ago, after seeing a failed comment survey on /r/Linux I decided to create a "real" survey using Google Docs to find out what Linux distributions (distros) the folks at /r/Linux were using. These past two years, the results of those surveys were very well received so I wanted to keep doing it. You can still view the [2012 survey](http://constantmayhem.com/ty-stuff/linuxsurvey/report.html) or the [2013 survey](http://constantmayhem.com/ty-stuff/linuxsurvey/2013.html).
+slug: results-of-the-2014-slash-r-slash-linux-distribution-survey
 
 
 ## Introduction
