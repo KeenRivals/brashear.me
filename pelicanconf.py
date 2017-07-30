@@ -22,6 +22,7 @@ STATIC_PATHS = ['images','files','extras',]
 EXTRA_PATH_METADATA = {
 	'extras/robots.txt': {'path': 'robots.txt'},
 	'extras/z8e6yosgc.txt': {'path': 'z8e6yosgc.txt'},
+	'extras/.htaccess': {'path': '.htaccess'},
 }
 
 THEME = 'themes/pelican-feather'

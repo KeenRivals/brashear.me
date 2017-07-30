@@ -1,0 +1,15 @@
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access plus 1 month"
+</IfModule>
+
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^/?(.*) https://brashear.me/$1 [R=301,L]
+
+# Set HSTS Header if user is on HTTPS
+SetEnvIf X-Forwarded-Proto "^https$" https_access
+Header set Strict-Transport-Security "max-age=15552000" env=https_access
+
+# Add MIME types
+AddType application/x-7z-compressed 7z
