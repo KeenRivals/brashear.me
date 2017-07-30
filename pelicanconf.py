@@ -16,9 +16,13 @@ PATH = 'content'
 DEFAULT_CATEGORY = 'Blog'
 
 # Clean the output directory each time we regenerate the site
-DELETE_OUTPUT_DIRECTORY = True
+#DELETE_OUTPUT_DIRECTORY = True
 
-STATIC_PATHS = ['images','files']
+STATIC_PATHS = ['images','files','extras',]
+EXTRA_PATH_METADATA = {
+	'extras/robots.txt': {'path': 'robots.txt'},
+	'extras/z8e6yosgc.txt': {'path': 'z8e6yosgc.txt'},
+}
 
 THEME = 'themes/pelican-feather'
 
@@ -57,4 +61,4 @@ SOCIAL = (
 DEFAULT_PAGINATION = 5
 
 # Uncomment following line if you want document-relative URLs when developing
-RELATIVE_URLS = True
+#RELATIVE_URLS = True

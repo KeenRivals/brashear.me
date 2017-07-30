@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: https://brashear.me/sitemap.xml 
