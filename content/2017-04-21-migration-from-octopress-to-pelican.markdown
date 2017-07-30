@@ -1,7 +1,6 @@
 title: Migration from Octopress to Pelican
-date: 2017-04-21T22:10-04:00
+date: 2017-07-30T11:01-04:00
 tags: blog, webdev
-status: draft
 summary:  Octopress has served me well so far. It was a good introduction to static blog generators when I started using it (early 2014). However, it's got enough cracks that I'm no longer interested in using it. As of this post I've migrated my blog to Pelican with my own custom theme which I'm calling pelican-feather.
 
 Octopress has served me well so far. It was a good introduction to static blog generators when I started using it (early 2014). However, it's got enough cracks that I'm no longer interested in using it. As of this post I've migrated my blog to Pelican with my own custom theme which I'm calling pelican-feather.
@@ -16,9 +15,9 @@ I'm far from an expert in either ruby or python, but the packaging infrastructur
 
 With pelican, I ``sudo pip install pelican`` and I'm on my way. It helps that the default install is less bloated than Octopress, so deeply customizing it is not a daunting task.
 
-## Pelican hemes are easy to make and use
+## Pelican Themes are easy to make and use
 
-I'm a sysadmin, not a web developer. Though I can sling some HTML & CSS, 
+I'm a sysadmin, not a web developer. Though I can sling some HTML & CSS, it's not my specialty. Creating a custom theme that worked well and looked decent with Pelican was easy.
 
 ## Octopress feels like abandonware
 
