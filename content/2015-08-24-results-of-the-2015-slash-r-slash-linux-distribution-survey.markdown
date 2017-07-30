@@ -36,7 +36,7 @@ The results are broken up by question. Many questions are broken up into the "To
 
 As per-usual, we see that the *vast* majority of /r/Linux is running Linux on non-server computers (henceforth referred to as desktops). We see 97% is using Linux on Desktops and 3% is not. This is pretty much spot-on with last year's result of 96% vs 4%.
 
-![Graph - Do you run Linux on any non-server computers?]({filename}/images/DistroSurvey2015/01%20-%20Do%20you%20run%20Linux%20on%20any%20non-server%20computers.svg">
+![Graph - Do you run Linux on any non-server computers?]({filename}/images/DistroSurvey2015/01%20-%20Do%20you%20run%20Linux%20on%20any%20non-server%20computers.svg)
 
 ## Do you use Linux on a server computer?
 
