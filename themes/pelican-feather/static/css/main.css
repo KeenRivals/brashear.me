@@ -1,0 +1,145 @@
+/*	pelican-feather | License: GPL3 | GitHub:  */
+ 
+html{
+	background:#000;
+}
+
+body {
+	background: #fff;
+	max-width: 55em;
+	margin: 0 auto;
+	padding:2em;
+	font-family: "Segoe UI", Segoe, Tahoma, Geneva, sans-serif;
+	line-height: 1.3;
+	font-size: 1.1em;
+	text-decoration-skip:ink;
+}
+
+/* Site Banner */
+.banner {
+	margin-top: 0;
+}
+
+.banner > a {
+	font-size:2.5em;
+	line-height:1.25
+}
+
+.banner a:link, .banner a:visited {
+	color: #000;
+	text-decoration:none
+}
+
+.banner > strong {
+	font-size:1em;
+	font-weight:normal;
+	line-height: 1.5;
+}
+
+/* Navigation */
+nav {
+	width:100%;
+	background:#000;
+	margin:0;
+	padding:0;
+	display:block;
+	color:#fff;
+	line-height:1.25;
+}
+
+nav ul, nav li  {
+	list-style:none;
+	display:block;
+	margin: 0;
+	padding:0;
+}
+
+nav li, nav a {
+	display:inline-block;
+}
+
+nav a {
+	padding:.5em 1em;
+}
+
+nav a:hover, nav a:active, nav a:visited:hover, nav a:visited:active {
+	background:#5675b9;
+	color:#fff;
+}
+
+nav a:link, nav a:visited {
+	color:#fff;
+	text-decoration:none;
+}
+
+/* Generic Content Styles */
+a:link, a:active, a:hover, a:visited, a:visited, a:visited:active, a:visited:hover {
+	color:#039;
+	text-decoration:underline;
+}
+
+a:visited {
+	color:#609;
+}
+
+a:hover, a:visited:hover, ol.article-listing h1 > a:hover, ol.article-listing h1 > a:visited:hover{
+	color:#5675b9;
+}
+
+.readmore {
+	background:#000;
+	display:inline-block;
+	padding:.5em 1em;
+}
+
+a.readmore:link, a.readmore:visited, a.readmore:hover, a.readmore:visited:hover, a.readmore:active, a.readmore:visited:active {
+	color:#fff;
+	text-decoration:none;
+}
+
+a.readmore:hover, a.readmore:visited:hover{
+	background:#5675b9;
+}
+
+ol.article-listing {
+	padding:0;
+	list-style:none;
+}
+
+ol.article-listing > li {
+	border-bottom:1px solid #272b35;
+	padding-bottom:1em;
+}
+
+ol.article-listing h1 > a:link, ol.article-listing h1 > a:visited, ol.article-listing h1 > a, .entry-title > a:link, .entry-title > a:visited, .entry-title > a {
+	color:#000;
+	text-decoration:none;
+}
+
+/* Automatically resize media elements to fit viewport */
+img, video, figure, svg, iframe, audio, object, embed {
+	max-width:100%;
+	height:auto;
+}
+
+code, pre {
+	font-family: Consolas, Cousine, "Liberation Mono", monospace;
+	background:#eee;
+	font-size: .9em;
+}
+
+pre {
+	padding:1em;
+	overflow: auto;
+}
+
+/* Article Info */
+.post-info {
+	font-size:.8em;
+	line-height:1;
+}
+
+.paginator a:link, .paginator a:visited, .paginator a:hover, .paginator a:active {
+	text-decoration: none;
+	font-weight:bold;
+}
