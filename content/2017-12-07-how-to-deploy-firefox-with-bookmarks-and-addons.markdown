@@ -17,4 +17,4 @@ Distribution.ini lives in ``<Firefox installation directory>\distribution\distri
 
 # Bundling Extensions
 
-Similar to distribution.ini, if you put extensions (in XPI form) into ``<Firefox installation directory>\distribution\extensions``, they will be installed on first-run. In my deployment example repository, uBlock Origin is deployed.
+Similar to distribution.ini, if you put extensions (in XPI form) into ``<Firefox installation directory>\distribution\extensions``, they will be installed on first-run. In my deployment example repository, uBlock Origin is deployed. Note that you have to rename the extension's xpi file to the extension's ID. You can find the extension ID by extracting the XPI (it's a zip file) and finding "id" in manifest.json. In the case of uBlock, the id is ``uBlock0@raymondhill.net``.
