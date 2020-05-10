@@ -25,7 +25,7 @@ For Fioptics TV to work, you need to enable IGMP snooping and tell it what port 
 	1. Set *Enable multicast routing* to **Enable**.
 	1. Set *Enable efficient multicast forwarding* to **Enable**.
 1. Set the IPTV STB port to the port the set top box is connected to (LAN1). On Fioptics, this may be the wireless bridge that connects to your STB.
-1. Apply the settings and your TV should be working. You may [view this screenshot of my settings for reference]({filename}/images/RT-N66U-IPTV-Settings.png "ASUS RT-AC86U IPTV Settings for Fioptics").
+1. Apply the settings and your TV should be working. You may [view this screenshot of my settings for reference]({static}/images/RT-N66U-IPTV-Settings.png "ASUS RT-AC86U IPTV Settings for Fioptics").
 
 ## Testing
 
