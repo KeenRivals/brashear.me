@@ -26,7 +26,7 @@ The SB6141 is a bit dated and only supports up to 100mbps. The SB6141 supports u
 
 # Choosing a Router
 
-You need a wireless router that's IPv6 compatible. Most recent models by big brand are, but many have some limitations. The [Netgear Nighthawk routers](https://www.amazon.com/gp/search/ref=as_li_qf_sp_sr_il_tl?ie=UTF8&tag=brashearme-20&keywords=netgear nighthawk&index=aps&camp=1789&creative=9325&linkCode=xm2&linkId=4df7aa8f8e021216bcc5f1f2686b2db0) are fairly good, but don't give you much control over the IPv6 firewall (it's either on of off). I am very happy with my [ASUS RT-AC88U](http://amzn.to/2gXLxS3), which gives me more control than the Netgear device did. The [ASUS RT-N66U](http://amzn.to/1jadh79) is a cheaper option with IPv6 capabilities—you'll only lose out on some wireless speed.
+You need a wireless router that's IPv6 compatible. Most recent models by big brands are, but many have some limitations. The [Netgear Nighthawk routers](https://www.amazon.com/gp/search/ref=as_li_qf_sp_sr_il_tl?ie=UTF8&tag=brashearme-20&keywords=netgear nighthawk&index=aps&camp=1789&creative=9325&linkCode=xm2&linkId=4df7aa8f8e021216bcc5f1f2686b2db0) are fairly good, but don't give you much control over the IPv6 firewall (it's either on of off). I am very happy with my [ASUS RT-AC88U](http://amzn.to/2gXLxS3), which gives me more control than the Netgear device did. The [ASUS RT-AC66U](https://amzn.to/2WhBxdN) is a cheaper option with IPv6 capabilities. You'll only lose out on some wireless speed.
 
 # Installation
 
