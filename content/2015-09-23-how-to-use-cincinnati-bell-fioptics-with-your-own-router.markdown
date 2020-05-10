@@ -1,6 +1,6 @@
 title: How to use Cincinnati Bell Fioptics with your own router
 date: 2015-09-23 12:37:33 -0400
-modified: 2018-10-27T10:58-04:00
+modified: 2020-05-09T23:16-04:00
 tags: networking
 summary: I recently purchased gigabit Fioptics Internet service from Cincinnati Bell. At first I was hesitant to go through with it. I did not want to use a crappy ISP router and forgo my wonderful [ASUS RT-AC86U](https://amzn.to/2EMMxcz) or be stuck running some sort of NAT-behind-NAT nightmare network. The day after installation, I took it upon myself to get my ASUS gateway working and remove Cincinnati Bell’s router. I was able to do this while keeping my Fioptics TV and on-demand features working. It was easy, but there is not much guidance out there on the Internet so I figured I would document my setup online. 
 
@@ -10,9 +10,9 @@ Disclosure: This article contains Amazon referral links. I receive a small amoun
 
 # Requirements
 
-* Your router needs to support [IGMP proxying and IGMP snooping](https://en.wikipedia.org/wiki/IGMP_snooping). The [ASUS RT-N66U](https://amzn.to/2qc9mME), [ASUS RT-AC86U](https://amzn.to/2EMMxcz), or the [ASUS RT-AC88U](https://amzn.to/2qdDmI3) are a good choice depending on your budget and performance needs.
+* Your router needs to support [IGMP proxying and IGMP snooping](https://en.wikipedia.org/wiki/IGMP_snooping). The [ASUS RT-AC66U](https://amzn.to/2WhBxdN), [ASUS RT-AC86U](https://amzn.to/2EMMxcz), or the [ASUS RT-AC88U](https://amzn.to/2qdDmI3) are a good choice depending on your budget and performance needs.
 	* I'm sure other vendors make home routers with proper IGMP support. This is an exercise I leave to you. Using a [modern wireless router](https://amzn.to/1UtRodX) is a good start. Read the manual!
-	* I've looked at the [Netgear Nighthawk routers](https://amzn.to/2O8cByl). They are nice devices but don't support easily support TV service like the ASUS routers do. If you only need Internet, those are an option.
+	* I've looked at the [Netgear Nighthawk routers](https://www.amazon.com/gp/search/ref=as_li_qf_sp_sr_tl?ie=UTF8&tag=brashearme-20&keywords=Netgear Nighthawk&index=aps&camp=1789&creative=9325&linkCode=ur2&linkId=7755e91e846271f4516d8f1c394604e4). They are nice devices but don't support easily support TV service like the ASUS routers do. If you only need Internet, those are an option.
 * If you're on gigabit service, your router also needs to support gigabit ethernet. Most routers do these days.
 * **Optional**: Your router should support MAC cloning/spoofing. This feature is also common.
 
