@@ -28,7 +28,7 @@ EXTRA_PATH_METADATA = {
 THEME = 'themes/pelican-feather'
 
 # Plugin settings
-PLUGIN_PATHS = ['plugins']
+PLUGIN_PATHS = ['plugins\sitemap\pelican\plugins']
 PLUGINS = ['sitemap']
 
 # Sitemap settings
