@@ -1,0 +1,3 @@
+pelican
+pelican-markdown
+pelican-sitemap
