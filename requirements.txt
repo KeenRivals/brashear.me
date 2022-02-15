@@ -1,3 +1,2 @@
-pelican
-pelican-markdown
-pelican-sitemap
+Markdown>=3.3.6
+pelican>=4.7.1
